@@ -134,3 +134,21 @@
 
 // // Executa a função
 // createTables();
+
+const mysql = require('mysql2/promise');
+require('dotenv').config();
+
+const pool = mysql.createPool({
+    host: process.env.DB_HOST, // Pega o host do .env ou usa 'localhost' como padrão.
+    user: process.env.DB_USER,      // Pega o usuário do .env ou usa 'root'.
+    port: process.env.DB_PORT,        // Pega a porta do .env ou usa 3309.
+    password: process.env.DB_PASSWORD, // Pega a senha do .env.
+    database: process.env.DB_NAME  // Pega o nome do banco de dados do .env         // Fila de espera ilimitada.
+});
+
+// Mensagem para confirmar que o pool foi criado (opcional, bom para depuração)
+console.log('Pool de conexões com o MySQL criado com sucesso.');
+
+// Exportamos o 'pool' para que outros arquivos (principalmente os Models) possam usá-lo
+// para executar consultas no banco de dados.
+module.exports = pool;
