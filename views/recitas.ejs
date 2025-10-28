@@ -1,0 +1,23 @@
+<h2>Todas as Receitas</h2>
+
+<% if (isAuthenticated) { %>
+    <a href="/receitas/novo" class="btn btn-primary mb-3">Adicionar Nova Receita</a>
+<% } %>
+
+<div class="recipe-grid">
+    <% if (recipes && recipes.length > 0) { %>
+        <% recipes.forEach(recipe => { %>
+            <div class="recipe-card">
+                <!-- Imagem Placeholder se não houver imagem real -->
+                <img src="<%= recipe.image_path || 'https://placehold.co/600x400/CCCCCC/333333?text=Receita' %>" alt="[Imagem de <%= recipe.title %>]">
+                <div class="recipe-card-content">
+                    <h3><%= recipe.title %></h3>
+                    <p><%= recipe.description ? recipe.description.substring(0, 100) + '...' : 'Sem descrição.' %></p>
+                    <a href="/receitas/<%= recipe.id %>" class="btn btn-secondary">Ver Detalhes</a>
+                </div>
+            </div>
+        <% }) %>
+    <% } else { %>
+        <p>Ainda não há receitas cadastradas.</p>
+    <% } %>
+</div>

@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Link para o ficheiro CSS -->
+    <link rel="stylesheet" href="/css/style.css">
+    <!-- Título dinâmico da página -->
+    <title><%= typeof title !== 'undefined' ? title + ' | Receitas.io' : 'Receitas.io' %></title>
+</head>
+<body>
+    <header class="navbar">
+        <div class="container nav-container">
+            <a href="/" class="logo">Receitas.io</a>
+            <nav>
+                <ul class="nav-links">
+                    <li><a href="/receitas">Explorar Receitas</a></li>
+                    <% if (isAuthenticated) { %>
+                        <!-- Links para utilizadores logados -->
+                        <li><a href="/dashboard">Meu Painel</a></li>
+                        <li><a href="/estoque">Meu Estoque</a></li>
+                        <li><a href="/receitas/novo">Nova Receita</a></li>
+                        <li><a href="/logout">Logout (<%= userName %>)</a></li>
+                    <% } else { %>
+                        <!-- Links para convidados -->
+                        <li><a href="/login">Login</a></li>
+                        <li><a href="/cadastro">Registo</a></li>
+                    <% } %>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container page-content">
+        <!-- O conteúdo específico de cada página será injetado aqui -->
+        <%- body %>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; <%= new Date().getFullYear() %> Receitas.io. Todos os direitos reservados.</p>
+        </div>
+    </footer>
+    
+    <!-- Link opcional para JavaScript do frontend -->
+    <script src="/js/main.js"></script>
+</body>
+</html>
+

@@ -1,0 +1,27 @@
+<div class="hero-section">
+    <h1>Bem-vindo ao Receitas.io!</h1>
+    <p>A sua plataforma para organizar e descobrir novos sabores.</p>
+    <% if (!isAuthenticated) { %>
+        <a href="/cadastro" class="btn btn-primary">Comece Agora Gratuitamente</a>
+    <% } else { %>
+        <a href="/dashboard" class="btn btn-primary">Ir para o Meu Painel</a>
+    <% } %>
+</div>
+
+<section class="features">
+    <h2>Funcionalidades Principais</h2>
+    <div class="feature-grid">
+        <div class="feature-item">
+            <h3>Organize as suas Receitas</h3>
+            <p>Guarde todas as suas receitas favoritas num só lugar.</p>
+        </div>
+        <div class="feature-item">
+            <h3>Controle o seu Estoque</h3>
+            <p>Saiba o que tem na despensa e gere a sua lista de compras.</p>
+        </div>
+        <div class="feature-item">
+            <h3>Informação Nutricional</h3>
+            <p>Calcule automaticamente as calorias e nutrientes das suas receitas.</p>
+        </div>
+    </div>
+</section>

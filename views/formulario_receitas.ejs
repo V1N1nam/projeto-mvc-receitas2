@@ -1,0 +1,77 @@
+<h2><%= typeof recipe !== 'undefined' ? 'Editar Receita' : 'Criar Nova Receita' %></h2>
+
+<form action="<%= typeof recipe !== 'undefined' ? '/receitas/' + recipe.id + '/editar' : '/receitas/novo' %>" method="POST" enctype="multipart/form-data">
+    <div class="form-group">
+        <label for="title">Título da Receita:</label>
+        <input type="text" id="title" name="title" value="<%= typeof recipe !== 'undefined' ? recipe.title : '' %>" required>
+    </div>
+
+    <div class="form-group">
+        <label for="description">Descrição Curta:</label>
+        <textarea id="description" name="description" rows="3"><%= typeof recipe !== 'undefined' ? recipe.description : '' %></textarea>
+    </div>
+
+    <div class="form-group">
+        <label for="instructions">Instruções (Modo de Preparo):</label>
+        <textarea id="instructions" name="instructions" rows="8" required><%= typeof recipe !== 'undefined' ? recipe.instructions : '' %></textarea>
+    </div>
+
+    <div class="form-group">
+        <label for="imagem">Foto da Receita:</label>
+        <input type="file" id="imagem" name="imagem" accept="image/*">
+        <% if (typeof recipe !== 'undefined' && recipe.image_path) { %>
+             <img src="<%= recipe.image_path %>" alt="Imagem atual" style="max-width: 200px; display: block; margin-top: 10px;">
+        <% } %>
+    </div>
+
+    <hr>
+    <h3>Ingredientes:</h3>
+    <div id="ingredients-list">
+        <!-- Ingredientes serão adicionados dinamicamente aqui (com JS) ou pode ser um loop inicial -->
+        <div class="ingredient-item">
+            <select name="ingredientIds[]" required>
+                <option value="">-- Selecione o Ingrediente --</option>
+                <% if (ingredients && ingredients.length > 0) { %>
+                    <% ingredients.forEach(ing => { %>
+                        <option value="<%= ing.id %>"><%= ing.name %></option>
+                    <% }) %>
+                <% } %>
+            </select>
+            <input type="number" name="quantities[]" placeholder="Quantidade" step="any" required>
+            <input type="text" name="units[]" placeholder="Unidade (ex: g, ml, xícara)" required>
+            <button type="button" class="btn-remove-ingredient" onclick="removeIngredient(this)">Remover</button>
+        </div>
+    </div>
+    <button type="button" class="btn btn-secondary" onclick="addIngredient()">Adicionar Ingrediente</button>
+    <hr>
+
+    <button type="submit" class="btn btn-primary">
+        <%= typeof recipe !== 'undefined' ? 'Atualizar Receita' : 'Salvar Receita' %>
+    </button>
+</form>
+
+<script>
+    function addIngredient() {
+        const list = document.getElementById('ingredients-list');
+        const newItem = document.createElement('div');
+        newItem.classList.add('ingredient-item');
+        newItem.innerHTML = `
+            <select name="ingredientIds[]" required>
+                <option value="">-- Selecione o Ingrediente --</option>
+                <% if (ingredients && ingredients.length > 0) { %>
+                    <% ingredients.forEach(ing => { %>
+                        <option value="<%= ing.id %>"><%= ing.name %></option>
+                    <% }) %>
+                <% } %>
+            </select>
+            <input type="number" name="quantities[]" placeholder="Quantidade" step="any" required>
+            <input type="text" name="units[]" placeholder="Unidade (ex: g, ml, xícara)" required>
+            <button type="button" class="btn-remove-ingredient" onclick="removeIngredient(this)">Remover</button>
+        `;
+        list.appendChild(newItem);
+    }
+
+    function removeIngredient(button) {
+        button.closest('.ingredient-item').remove();
+    }
+</script>

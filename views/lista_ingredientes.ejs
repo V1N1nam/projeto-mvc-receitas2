@@ -1,0 +1,36 @@
+<h2>Ingredientes Base (Enciclopédia)</h2>
+<a href="/ingredientes/novo" class="btn btn-primary mb-3">Adicionar Novo Ingrediente</a>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Nome</th>
+            <th>Calorias (100g)</th>
+            <th>Proteínas (100g)</th>
+            <th>Carboidratos (100g)</th>
+            <th>Gorduras (100g)</th>
+            <th>Ações</th>
+        </tr>
+    </thead>
+    <tbody>
+        <% if (ingredients && ingredients.length > 0) { %>
+            <% ingredients.forEach(ing => { %>
+                <tr>
+                    <td><%= ing.name %></td>
+                    <td><%= ing.calories || 'N/A' %></td>
+                    <td><%= ing.proteins || 'N/A' %></td>
+                    <td><%= ing.carbs || 'N/A' %></td>
+                    <td><%= ing.fats || 'N/A' %></td>
+                    <td>
+                        <a href="/ingredientes/<%= ing.id %>/editar" class="btn btn-sm btn-warning">Editar</a>
+                        <!-- Adicionar formulário para delete seguro -->
+                    </td>
+                </tr>
+            <% }) %>
+        <% } else { %>
+            <tr>
+                <td colspan="6">Nenhum ingrediente cadastrado.</td>
+            </tr>
+        <% } %>
+    </tbody>
+</table>

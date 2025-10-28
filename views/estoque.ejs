@@ -1,0 +1,49 @@
+<h2>Meu Estoque (Despensa Virtual)</h2>
+
+<div class="pantry-container">
+    <div class="pantry-list">
+        <h3>Itens no Estoque</h3>
+        <% if (pantryItems && pantryItems.length > 0) { %>
+            <ul class="list-group">
+                <% pantryItems.forEach(item => { %>
+                    <li class="list-group-item">
+                        <span><%= item.name %>: <%= item.quantity %> <%= item.unit %></span>
+                        <!-- Adicionar botões para editar quantidade ou remover -->
+                        <a href="/estoque/remover/<%= item.id %>" class="btn btn-sm btn-danger float-right">Remover</a>
+                    </li>
+                <% }) %>
+            </ul>
+        <% } else { %>
+            <p>O seu estoque está vazio.</p>
+        <% } %>
+    </div>
+
+    <div class="pantry-add-form">
+        <h3>Adicionar Item ao Estoque</h3>
+        <% if (typeof error !== 'undefined' && error) { %>
+             <div class="alert alert-danger"><%= error %></div>
+        <% } %>
+        <form action="/estoque/adicionar" method="POST">
+            <div class="form-group">
+                <label for="ingredientId">Ingrediente:</label>
+                <select id="ingredientId" name="ingredientId" required>
+                    <option value="">-- Selecione --</option>
+                    <% if (ingredients && ingredients.length > 0) { %>
+                        <% ingredients.forEach(ing => { %>
+                            <option value="<%= ing.id %>"><%= ing.name %></option>
+                        <% }) %>
+                    <% } %>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="quantity">Quantidade:</label>
+                <input type="number" id="quantity" name="quantity" step="any" required>
+            </div>
+            <div class="form-group">
+                <label for="unit">Unidade:</label>
+                <input type="text" id="unit" name="unit" placeholder="g, ml, unidade, etc." required>
+            </div>
+            <button type="submit" class="btn btn-primary">Adicionar ao Estoque</button>
+        </form>
+    </div>
+</div>

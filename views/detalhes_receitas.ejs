@@ -1,0 +1,41 @@
+<div class="recipe-details">
+    <div class="recipe-header">
+        <h1><%= recipe.title %></h1>
+        <% if (recipe.image_path) { %>
+            <img src="<%= recipe.image_path %>" alt="[Imagem de <%= recipe.title %>]" class="recipe-image">
+        <% } %>
+        <p class="recipe-description"><%= recipe.description %></p>
+    </div>
+
+    <div class="recipe-content">
+        <div class="recipe-ingredients">
+            <h3>Ingredientes Necessários</h3>
+            <ul>
+                <% if (ingredients && ingredients.length > 0) { %>
+                    <% ingredients.forEach(ing => { %>
+                        <li>
+                            <%= ing.quantity %> <%= ing.unit %> de <%= ing.name %>
+                            <% if (typeof ing.inStock !== 'undefined') { %>
+                                <% if (ing.inStock) { %>
+                                    <span class="stock-status in-stock">(Em estoque ✓)</span>
+                                <% } else { %>
+                                    <span class="stock-status out-of-stock">(Faltando X)</span>
+                                    <!-- Poderia adicionar botão "Adicionar à lista de compras" -->
+                                <% } %>
+                            <% } %>
+                        </li>
+                    <% }) %>
+                <% } else { %>
+                    <li>Não há ingredientes listados para esta receita.</li>
+                <% } %>
+            </ul>
+        </div>
+
+        <div class="recipe-instructions">
+            <h3>Modo de Preparo</h3>
+            <p><%= recipe.instructions.replace(/\n/g, '<br>') %></p> <!-- Mostra quebras de linha -->
+        </div>
+    </div>
+    
+    <!-- Adicionar cálculo nutricional aqui no futuro -->
+</div>
