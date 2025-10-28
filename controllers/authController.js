@@ -1,39 +1,85 @@
-// Importamos o nosso modelo de usuário para acessar o banco de dados.
-// Certifique-se de que o caminho para o seu userModel está correto.
-// const userModel = require('../models/userModel');
-// Importamos o bcrypt para criptografar e comparar senhas.
-// const bcrypt = require('bcryptjs');
+const userModel = require('../models/userModel');
+const bcrypt = require('bcryptjs');
 
-// O 'authController' é um objeto que agrupa todas as funções lógicas de autenticação.
-// Cada propriedade deste objeto DEVE ser uma função.
+// O authController lida especificamente com login, registo e logout.
 const authController = {
 
-    // Função para renderizar (mostrar) a página de cadastro.
+    // Mostra a página de registo
     showRegisterPage(req, res) {
-        // 'res.render' usa o EJS para gerar o HTML da página de registro.
-        // Certifique-se que o arquivo 'register.ejs' existe na pasta 'views'.
-        res.render('register', { title: 'Cadastro' });
+        // Renderiza o ficheiro ejs de registo (ex: views/register.ejs)
+        res.render('register', { title: 'Registo' });
     },
 
-    // Função para processar os dados do formulário de cadastro (a ser implementada).
-    registerUser(req, res) {
-        // A lógica de cadastro (validar, criptografar, salvar) virá aqui.
-        res.send('Usuário será registrado aqui.');
+    // Processa o formulário de registo
+    async registerUser(req, res) {
+        try {
+            const { name, email, password } = req.body;
+            // Validação simples
+            if (!name || !email || !password) {
+                return res.render('register', { error: 'Todos os campos são obrigatórios.' });
+            }
+            // Verifica se o utilizador já existe
+            const existingUser = await userModel.findByEmail(email);
+            if (existingUser) {
+                return res.render('register', { error: 'Este e-mail já está em uso.' });
+            }
+            // Cria o utilizador (a encriptação é feita no model)
+            await userModel.create(name, email, password);
+            // Redireciona para a página de login após o sucesso
+            res.redirect('/login');
+        } catch (error) {
+            console.error(error);
+            res.render('register', { error: 'Erro ao criar conta.' });
+        }
     },
 
-    // Função para mostrar a página de login.
+    // Mostra a página de login
     showLoginPage(req, res) {
-        // Certifique-se que o arquivo 'login.ejs' existe na pasta 'views'.
+        // Renderiza o ficheiro ejs de login (ex: views/login.ejs)
         res.render('login', { title: 'Login' });
     },
 
-    // Função para processar o login (a ser implementada).
-    processLogin(req, res) {
-        res.send('Lógica de login será implementada aqui.');
+    // Processa o formulário de login
+    async loginUser(req, res) {
+        try {
+            const { email, password } = req.body;
+            if (!email || !password) {
+                return res.render('login', { error: 'Todos os campos são obrigatórios.' });
+            }
+            // Encontra o utilizador
+            const user = await userModel.findByEmail(email);
+            if (!user) {
+                return res.render('login', { error: 'E-mail ou senha inválidos.' });
+            }
+            // Compara a senha
+            const isMatch = await bcrypt.compare(password, user.password);
+            if (!isMatch) {
+                return res.render('login', { error: 'E-mail ou senha inválidos.' });
+            }
+            // Inicia a sessão (Requer o 'express-session' configurado no app.js)
+            req.session.userId = user.id;
+            req.session.userName = user.name;
+            // Redireciona para a área interna, ex: /dashboard
+            res.redirect('/dashboard');
+        } catch (error) {
+            console.error(error);
+            res.render('login', { error: 'Erro ao fazer login.' });
+        }
+    },
+
+    // Faz logout do utilizador
+    logoutUser(req, res) {
+        // Destrói a sessão
+        req.session.destroy(err => {
+            if (err) {
+                return res.redirect('/dashboard'); // Se houver erro, fica na mesma
+            }
+            // Limpa o cookie e redireciona para a home
+            res.clearCookie('connect.sid'); // O nome do cookie pode variar
+            res.redirect('/');
+        });
     }
 };
 
-// Esta linha é a mais importante.
-// Ela exporta o objeto 'authController' com todas as suas funções.
-// Se esta linha faltar, o authRoutes.js receberá 'undefined'.
 module.exports = authController;
+

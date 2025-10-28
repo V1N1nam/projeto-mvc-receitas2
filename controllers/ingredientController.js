@@ -1,84 +1,41 @@
-const userModel = require('../models/userModel');
-const bcrypt = require('bcryptjs');
+const ingredientModel = require('../models/ingredientModel');
 
-// O authController lida especificamente com login, registo e logout.
-const authController = {
+// Este controller gere o CRUD da "enciclopédia" de ingredientes
+const ingredientController = {
 
-    // Mostra a página de registo
-    showRegisterPage(req, res) {
-        // Renderiza o ficheiro ejs de registo
-        res.render('register', { title: 'Registo' });
-    },
-
-    // Processa o formulário de registo
-    async registerUser(req, res) {
+    // Lista todos os ingredientes
+    async listAll(req, res) {
         try {
-            const { name, email, password } = req.body;
-            // Validação simples
-            if (!name || !email || !password) {
-                return res.render('register', { error: 'Todos os campos são obrigatórios.' });
-            }
-            // Verifica se o utilizador já existe
-            const existingUser = await userModel.findByEmail(email);
-            if (existingUser) {
-                return res.render('register', { error: 'Este e-mail já está em uso.' });
-            }
-            // Cria o utilizador (a encriptação é feita no model)
-            await userModel.create(name, email, password);
-            // Redireciona para a página de login após o sucesso
-            res.redirect('/login');
+            const ingredients = await ingredientModel.findAll();
+            // Assegure-se de que tem uma view em 'views/ingredients/list.ejs'
+            res.render('ingredients/list', { ingredients, title: 'Ingredientes' });
         } catch (error) {
             console.error(error);
-            res.render('register', { error: 'Erro ao criar conta.' });
+            res.status(500).send('Erro ao carregar ingredientes.');
         }
     },
 
-    // Mostra a página de login
-    showLoginPage(req, res) {
-        res.render('login', { title: 'Login' });
+    // Mostra o formulário para criar um novo ingrediente
+    showCreateForm(req, res) {
+        // Assegure-se de que tem uma view em 'views/ingredients/form.ejs'
+        res.render('ingredients/form', { title: 'Novo Ingrediente' });
     },
 
-    // Processa o formulário de login
-    async loginUser(req, res) {
+    // Processa a criação do novo ingrediente
+    async create(req, res) {
         try {
-            const { email, password } = req.body;
-            if (!email || !password) {
-                return res.render('login', { error: 'Todos os campos são obrigatórios.' });
-            }
-            // Encontra o utilizador
-            const user = await userModel.findByEmail(email);
-            if (!user) {
-                return res.render('login', { error: 'E-mail ou senha inválidos.' });
-            }
-            // Compara a senha
-            const isMatch = await bcrypt.compare(password, user.password);
-            if (!isMatch) {
-                return res.render('login', { error: 'E-mail ou senha inválidos.' });
-            }
-            // Inicia a sessão (Requer o 'express-session' configurado no app.js)
-            req.session.userId = user.id;
-            req.session.userName = user.name;
-            // Redireciona para a área interna, ex: /dashboard
-            res.redirect('/dashboard'); // Crie esta rota!
+            const { name, calories, proteins, carbs, fats } = req.body;
+            await ingredientModel.create(name, calories, proteins, carbs, fats);
+            res.redirect('/ingredientes'); // Redireciona para a lista
         } catch (error) {
             console.error(error);
-            res.render('login', { error: 'Erro ao fazer login.' });
+            res.render('ingredients/form', { error: 'Erro ao criar ingrediente.' });
         }
     },
-
-    // Faz logout do utilizador
-    logoutUser(req, res) {
-        // Destrói a sessão
-        req.session.destroy(err => {
-            if (err) {
-                return res.redirect('/dashboard'); // Se houver erro, fica na mesma
-            }
-            // Limpa o cookie e redireciona para a home
-            res.clearCookie('connect.sid'); // O nome do cookie pode variar
-            res.redirect('/');
-        });
-    }
+    
+    // (Funções para Editar e Apagar seguiriam o mesmo padrão)
 };
 
-module.exports = authController;
+// EXPORTA O CONTROLADOR CORRETO
+module.exports = ingredientController;
 

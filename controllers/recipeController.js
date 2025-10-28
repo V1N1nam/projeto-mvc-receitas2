@@ -1,84 +1,121 @@
-const userModel = require('../models/userModel');
-const bcrypt = require('bcryptjs');
+const recipeModel = require('../models/recipeModel');
+const ingredientModel = require('../models/ingredientModel');
+const pantryItemModel = require('../models/pantryItemModel');
 
-// O authController lida especificamente com login, registo e logout.
-const authController = {
+// O controller mais complexo, pois gere receitas e os seus ingredientes
+const recipeController = {
 
-    // Mostra a página de registo
-    showRegisterPage(req, res) {
-        // Renderiza o ficheiro ejs de registo
-        res.render('register', { title: 'Registo' });
-    },
-
-    // Processa o formulário de registo
-    async registerUser(req, res) {
+    // Lista todas as receitas
+    async listAll(req, res) {
         try {
-            const { name, email, password } = req.body;
-            // Validação simples
-            if (!name || !email || !password) {
-                return res.render('register', { error: 'Todos os campos são obrigatórios.' });
-            }
-            // Verifica se o utilizador já existe
-            const existingUser = await userModel.findByEmail(email);
-            if (existingUser) {
-                return res.render('register', { error: 'Este e-mail já está em uso.' });
-            }
-            // Cria o utilizador (a encriptação é feita no model)
-            await userModel.create(name, email, password);
-            // Redireciona para a página de login após o sucesso
-            res.redirect('/login');
+            const recipes = await recipeModel.findAll();
+             // Assegure-se de que tem uma view em 'views/recipes/list.ejs'
+            res.render('recipes/list', { recipes, title: 'Receitas' });
         } catch (error) {
             console.error(error);
-            res.render('register', { error: 'Erro ao criar conta.' });
+            res.status(500).send('Erro ao carregar receitas.');
         }
     },
 
-    // Mostra a página de login
-    showLoginPage(req, res) {
-        res.render('login', { title: 'Login' });
-    },
-
-    // Processa o formulário de login
-    async loginUser(req, res) {
+    // Mostra o formulário de criação de receita
+    async showCreateForm(req, res) {
         try {
-            const { email, password } = req.body;
-            if (!email || !password) {
-                return res.render('login', { error: 'Todos os campos são obrigatórios.' });
-            }
-            // Encontra o utilizador
-            const user = await userModel.findByEmail(email);
-            if (!user) {
-                return res.render('login', { error: 'E-mail ou senha inválidos.' });
-            }
-            // Compara a senha
-            const isMatch = await bcrypt.compare(password, user.password);
-            if (!isMatch) {
-                return res.render('login', { error: 'E-mail ou senha inválidos.' });
-            }
-            // Inicia a sessão (Requer o 'express-session' configurado no app.js)
-            req.session.userId = user.id;
-            req.session.userName = user.name;
-            // Redireciona para a área interna, ex: /dashboard
-            res.redirect('/dashboard'); // Crie esta rota!
+            // Para criar uma receita, precisamos da lista de todos os ingredientes
+            const ingredients = await ingredientModel.findAll();
+            // Assegure-se de que tem uma view em 'views/recipes/form.ejs'
+            res.render('recipes/form', { title: 'Nova Receita', ingredients });
         } catch (error) {
             console.error(error);
-            res.render('login', { error: 'Erro ao fazer login.' });
+            res.status(500).send('Erro ao carregar o formulário.');
         }
     },
 
-    // Faz logout do utilizador
-    logoutUser(req, res) {
-        // Destrói a sessão
-        req.session.destroy(err => {
-            if (err) {
-                return res.redirect('/dashboard'); // Se houver erro, fica na mesma
+    // Processa a criação da receita
+    async create(req, res) {
+        try {
+            const { title, description, instructions } = req.body;
+            const userId = req.session.userId; // Pega o ID do utilizador da sessão
+            
+            // Lógica de Upload de Imagem (usando Multer)
+            // O 'req.file' é disponibilizado pelo middleware 'upload.single()' na rota
+            const image_path = req.file ? `/uploads/${req.file.filename}` : null;
+
+            // 1. Cria a receita base
+            const newRecipe = await recipeModel.create(title, description, instructions, image_path, userId);
+            
+            // 2. Adiciona os ingredientes na receita
+            const { ingredientIds, quantities, units } = req.body;
+            if (ingredientIds && quantities && units) {
+                // Transforma em array se for apenas um
+                const ingredientsArray = Array.isArray(ingredientIds) ? ingredientIds : [ingredientIds];
+                const quantitiesArray = Array.isArray(quantities) ? quantities : [quantities];
+                const unitsArray = Array.isArray(units) ? units : [units];
+
+                for (let i = 0; i < ingredientsArray.length; i++) {
+                    // Garante que não está a adicionar campos vazios
+                    if(ingredientsArray[i] && quantitiesArray[i] && unitsArray[i]) {
+                        await recipeModel.addIngredientToRecipe(
+                            newRecipe.id, 
+                            ingredientsArray[i], 
+                            quantitiesArray[i], 
+                            unitsArray[i]
+                        );
+                    }
+                }
             }
-            // Limpa o cookie e redireciona para a home
-            res.clearCookie('connect.sid'); // O nome do cookie pode variar
-            res.redirect('/');
-        });
+            res.redirect(`/receitas/${newRecipe.id}`);
+        } catch (error) {
+            console.error(error);
+            res.status(500).send('Erro ao criar receita.');
+        }
+    },
+
+    // Mostra os detalhes de uma receita
+    async getDetails(req, res) {
+        try {
+            const recipeId = req.params.id;
+            const userId = req.session.userId || null; // Pega o ID (ou null se for convidado)
+
+            // 1. Busca a receita
+            const recipe = await recipeModel.findById(recipeId);
+            if (!recipe) {
+                return res.status(404).send('Receita não encontrada.');
+            }
+            
+            // 2. Busca os ingredientes da receita
+            const recipeIngredients = await recipeModel.findIngredientsByRecipeId(recipeId);
+            
+            let ingredientsWithStockInfo = recipeIngredients.map(ing => ({ ...ing, inStock: false }));
+
+            // 3. (Inteligência) Se o utilizador estiver logado, verifica o estoque
+            if (userId) {
+                const pantryItems = await pantryItemModel.findByUserId(userId);
+                const pantryMap = new Map();
+                pantryItems.forEach(item => pantryMap.set(item.name, item.quantity));
+
+                // 4. Compara os ingredientes da receita com o estoque
+                ingredientsWithStockInfo = recipeIngredients.map(ing => ({
+                    ...ing,
+                    inStock: pantryMap.has(ing.name) && pantryMap.get(ing.name) >= ing.quantity,
+                    needed: ing.quantity,
+                    available: pantryMap.get(ing.name) || 0
+                }));
+            }
+            // Assegure-se de que tem uma view em 'views/recipes/details.ejs'
+            res.render('recipes/details', { 
+                recipe, 
+                ingredients: ingredientsWithStockInfo, 
+                title: recipe.title 
+            });
+
+        } catch (error) {
+            console.error(error);
+            res.status(500).send('Erro ao carregar detalhes da receita.');
+        }
     }
+    // (Funções de Update e Delete ficariam aqui)
 };
 
-module.exports = authController;
+// EXPORTA O CONTROLADOR CORRETO
+module.exports = recipeController;
 
