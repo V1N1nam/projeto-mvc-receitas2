@@ -19,17 +19,21 @@ const upload = multer({ storage: storage });
 // Rota pública - Lista todas as receitas (ex: /receitas)
 router.get('/', recipeController.listAll);
 
-// Rota pública - Vê detalhes de uma receita (ex: /receitas/1)
-router.get('/:id', recipeController.getDetails);
-
-// --- Rotas Protegidas ---
+// --- Rotas Protegidas (e Específicas) PRIMEIRO ---
 
 // Mostra o formulário para criar uma nova receita (ex: /receitas/novo)
-// NOTA: Esta rota TEM de vir antes de '/:id'
+// CORREÇÃO: Esta rota foi movida para ANTES de '/:id'
 router.get('/novo', isAuthenticated, recipeController.showCreateForm);
 
 // Processa a criação da nova receita, com upload de imagem
 router.post('/novo', isAuthenticated, upload.single('imagem'), recipeController.create);
+
+// --- Rotas Públicas (e Genéricas) DEPOIS ---
+
+// Rota pública - Vê detalhes de uma receita (ex: /receitas/1)
+// Esta rota tem de ser uma das últimas, pois "apanha" tudo.
+router.get('/:id', recipeController.getDetails);
+
 
 // (Rotas de update e delete ficariam aqui)
 

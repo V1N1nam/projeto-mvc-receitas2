@@ -3,12 +3,15 @@ const ingredientModel = require('../models/ingredientModel');
 // Este controller gere o CRUD da "enciclopédia" de ingredientes
 const ingredientController = {
 
-    // Lista todos os ingredientes
+    // Lista todos os ingredientes 
     async listAll(req, res) {
         try {
             const ingredients = await ingredientModel.findAll();
-            // Assegure-se de que tem uma view em 'views/ingredients/list.ejs'
-            res.render('ingredients/list', { ingredients, title: 'Ingredientes' });
+            
+            // =======================================================
+            // CORREÇÃO: Alterado de 'ingredientes/list' para 'lista_ingredientes'
+            // =======================================================
+            res.render('lista_ingredientes', { ingredients, title: 'Ingredientes' });
         } catch (error) {
             console.error(error);
             res.status(500).send('Erro ao carregar ingredientes.');
@@ -17,8 +20,11 @@ const ingredientController = {
 
     // Mostra o formulário para criar um novo ingrediente
     showCreateForm(req, res) {
-        // Assegure-se de que tem uma view em 'views/ingredients/form.ejs'
-        res.render('ingredients/form', { title: 'Novo Ingrediente' });
+        
+        // =======================================================
+        // CORREÇÃO: Alterado de 'ingredientes/form' para 'formularios_ingredientes'
+        // =======================================================
+        res.render('formularios_ingredientes', { title: 'Novo Ingrediente' });
     },
 
     // Processa a criação do novo ingrediente
@@ -29,7 +35,10 @@ const ingredientController = {
             res.redirect('/ingredientes'); // Redireciona para a lista
         } catch (error) {
             console.error(error);
-            res.render('ingredients/form', { error: 'Erro ao criar ingrediente.' });
+            // =======================================================
+            // CORREÇÃO: Apontando para o formulário correto em caso de erro
+            // =======================================================
+            res.render('formularios_ingredientes', { error: 'Erro ao criar ingrediente.' });
         }
     },
     
@@ -38,4 +47,3 @@ const ingredientController = {
 
 // EXPORTA O CONTROLADOR CORRETO
 module.exports = ingredientController;
-

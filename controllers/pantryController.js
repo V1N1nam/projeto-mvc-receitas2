@@ -16,7 +16,10 @@ const pantryController = {
             // Lista todos os ingredientes para o formulário de "Adicionar"
             const ingredients = await ingredientModel.findAll();
 
-            res.render('pantry', { 
+            // =======================================================
+            // CORREÇÃO: Alterado de 'pantry' para 'estoque'
+            // =======================================================
+            res.render('estoque', { 
                 pantryItems, 
                 ingredients, 
                 title: 'Meu Estoque' 
@@ -37,15 +40,27 @@ const pantryController = {
                 return res.status(403).send('Acesso negado.');
             }
             if (!ingredientId || !quantity || !unit) {
-                return res.redirect('/estoque?error=Campos em falta');
+                // =======================================================
+                // MELHORIA: Usando flash message
+                // =======================================================
+                req.flash('error', 'Todos os campos são obrigatórios.');
+                return res.redirect('/estoque');
             }
 
             await pantryItemModel.addItem(userId, ingredientId, quantity, unit);
+            // =======================================================
+            // MELHORIA: Usando flash message
+            // =======================================================
+            req.flash('success', 'Item adicionado ao estoque!');
             res.redirect('/estoque'); // Recarrega a página de estoque
         } catch (error)
         {
             console.error(error);
-            res.status(500).send('Erro ao adicionar item.');
+            // =======================================================
+            // MELHORIA: Usando flash message
+            // =======================================================
+            req.flash('error', 'Erro ao adicionar item.');
+            res.redirect('/estoque');
         }
     },
 
@@ -62,10 +77,18 @@ const pantryController = {
             }
 
             await pantryItemModel.delete(pantryItemId);
+            // =======================================================
+            // MELHORIA: Usando flash message
+            // =======================================================
+            req.flash('success', 'Item removido do estoque.');
             res.redirect('/estoque');
         } catch (error) {
             console.error(error);
-            res.status(500).send('Erro ao remover item.');
+            // =======================================================
+            // MELHORIA: Usando flash message
+            // =======================================================
+            req.flash('error', 'Erro ao remover item.');
+            res.redirect('/estoque');
         }
     }
     // (Função de Update de quantidade ficaria aqui)

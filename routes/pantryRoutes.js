@@ -13,7 +13,7 @@ router.get('/', pantryController.showPantry);
 router.post('/adicionar', pantryController.addItem);
 
 // Remove um item do estoque (ex: GET /estoque/remover/5)
-// Nota: Um POST ou DELETE seria semanticamente melhor, mas GET é mais simples para links
 router.get('/remover/:id', pantryController.deleteItem); 
 
+// VERIFIQUE SE ESTA LINHA ESTÁ NO FINAL DO SEU ARQUIVO:
 module.exports = router;

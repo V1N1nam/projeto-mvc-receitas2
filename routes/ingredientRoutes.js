@@ -17,4 +17,5 @@ router.post('/novo', ingredientController.create);
 
 // (Rotas de update e delete ficariam aqui)
 
+// VERIFIQUE SE ESTA LINHA ESTÁ NO FINAL DO SEU ARQUIVO:
 module.exports = router;
