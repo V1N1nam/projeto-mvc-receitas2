@@ -9,8 +9,11 @@ const recipeController = {
     async listAll(req, res) {
         try {
             const recipes = await recipeModel.findAll();
-             // Assegure-se de que tem uma view em 'views/recipes/list.ejs'
-            res.render('recipes/list', { recipes, title: 'Receitas' });
+             
+            // CORREÇÃO: Alterado de 'recipes/list' para 'recitas'
+            // para corresponder ao nome do seu arquivo EJS.
+            res.render('recitas', { recipes, title: 'Receitas' });
+
         } catch (error) {
             console.error(error);
             res.status(500).send('Erro ao carregar receitas.');
@@ -22,8 +25,12 @@ const recipeController = {
         try {
             // Para criar uma receita, precisamos da lista de todos os ingredientes
             const ingredients = await ingredientModel.findAll();
-            // Assegure-se de que tem uma view em 'views/recipes/form.ejs'
-            res.render('recipes/form', { title: 'Nova Receita', ingredients });
+            
+            // ASSUMINDO: Que o seu formulário se chama 'formulario_receitas.ejs'
+            // Se o nome for 'recipes/form.ejs' (como no controller de ingredientes),
+            // esta linha também precisará de ser ajustada.
+            res.render('formulario_receitas', { title: 'Nova Receita', ingredients });
+
         } catch (error) {
             console.error(error);
             res.status(500).send('Erro ao carregar o formulário.');
@@ -101,8 +108,9 @@ const recipeController = {
                     available: pantryMap.get(ing.name) || 0
                 }));
             }
-            // Assegure-se de que tem uma view em 'views/recipes/details.ejs'
-            res.render('recipes/details', { 
+
+            // CORREÇÃO: Apontei para o seu arquivo 'detalhes_receitas.ejs'
+            res.render('detalhes_receitas', { 
                 recipe, 
                 ingredients: ingredientsWithStockInfo, 
                 title: recipe.title 
@@ -118,4 +126,3 @@ const recipeController = {
 
 // EXPORTA O CONTROLADOR CORRETO
 module.exports = recipeController;
-

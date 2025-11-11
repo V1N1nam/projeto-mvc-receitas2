@@ -1,6 +1,13 @@
 <h2><%= typeof recipe !== 'undefined' ? 'Editar Receita' : 'Criar Nova Receita' %></h2>
 
+<!-- 
+    Este formulário envia os dados para a rota 'POST /receitas/novo', 
+    que é processada pela sua função 'create' no recipeController.
+    O 'enctype="multipart/form-data"' é crucial para o upload da imagem.
+-->
 <form action="<%= typeof recipe !== 'undefined' ? '/receitas/' + recipe.id + '/editar' : '/receitas/novo' %>" method="POST" enctype="multipart/form-data">
+    
+    <!-- Estes campos correspondem à sua tabela 'Recipes' -->
     <div class="form-group">
         <label for="title">Título da Receita:</label>
         <input type="text" id="title" name="title" value="<%= typeof recipe !== 'undefined' ? recipe.title : '' %>" required>
@@ -18,6 +25,7 @@
 
     <div class="form-group">
         <label for="imagem">Foto da Receita:</label>
+        <!-- O 'name="imagem"' corresponde ao 'upload.single('imagem')' na sua rota -->
         <input type="file" id="imagem" name="imagem" accept="image/*">
         <% if (typeof recipe !== 'undefined' && recipe.image_path) { %>
              <img src="<%= recipe.image_path %>" alt="Imagem atual" style="max-width: 200px; display: block; margin-top: 10px;">
@@ -26,8 +34,8 @@
 
     <hr>
     <h3>Ingredientes:</h3>
+    <!-- Esta secção é processada pelo loop 'for' na sua função 'create' -->
     <div id="ingredients-list">
-        <!-- Ingredientes serão adicionados dinamicamente aqui (com JS) ou pode ser um loop inicial -->
         <div class="ingredient-item">
             <select name="ingredientIds[]" required>
                 <option value="">-- Selecione o Ingrediente --</option>
@@ -50,12 +58,18 @@
     </button>
 </form>
 
+<!-- 
+    Este script permite adicionar e remover linhas de ingredientes dinamicamente.
+    O 'name="ingredientIds[]"' (com colchetes) envia os dados como um array.
+-->
 <script>
     function addIngredient() {
         const list = document.getElementById('ingredients-list');
         const newItem = document.createElement('div');
         newItem.classList.add('ingredient-item');
-        newItem.innerHTML = `
+        
+        // Clona a lista de ingredientes do EJS para o novo <select>
+        const selectHTML = `
             <select name="ingredientIds[]" required>
                 <option value="">-- Selecione o Ingrediente --</option>
                 <% if (ingredients && ingredients.length > 0) { %>
@@ -64,6 +78,10 @@
                     <% }) %>
                 <% } %>
             </select>
+        `;
+        
+        newItem.innerHTML = `
+            ${selectHTML}
             <input type="number" name="quantities[]" placeholder="Quantidade" step="any" required>
             <input type="text" name="units[]" placeholder="Unidade (ex: g, ml, xícara)" required>
             <button type="button" class="btn-remove-ingredient" onclick="removeIngredient(this)">Remover</button>
@@ -72,6 +90,15 @@
     }
 
     function removeIngredient(button) {
-        button.closest('.ingredient-item').remove();
+        // Garante que não remove o último item (opcional, mas boa prática)
+        const list = document.getElementById('ingredients-list');
+        if (list.children.length > 1) {
+            button.closest('.ingredient-item').remove();
+        } else {
+            // Se for o último, pode limpar os campos em vez de remover
+            const item = button.closest('.ingredient-item');
+            item.querySelector('select').value = "";
+            item.querySelectorAll('input').forEach(input => input.value = "");
+        }
     }
 </script>

@@ -1,10 +1,8 @@
 <div class="auth-form-container">
     <h2>Crie a sua Conta</h2>
     
-    <!-- Exibe mensagens de erro, se houver -->
-    <% if (typeof error !== 'undefined' && error) { %>
-        <div class="alert alert-danger"><%= error %></div>
-    <% } %>
+    <!-- A lógica de erro foi MOVIDA para o layout.ejs -->
+    <!-- Não é mais necessário aqui -->
 
     <form action="/cadastro" method="POST">
         <div class="form-group">

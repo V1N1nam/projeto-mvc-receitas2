@@ -1,41 +1,48 @@
 const userModel = require('../models/userModel');
 const bcrypt = require('bcryptjs');
 
-// O authController lida especificamente com login, registo e logout.
 const authController = {
 
     // Mostra a página de registo
     showRegisterPage(req, res) {
-        // Renderiza o ficheiro ejs de registo (ex: views/register.ejs)
-        res.render('register', { title: 'Registo' });
+        // A página de registo agora irá buscar mensagens de erro do flash
+        res.render('registro', { title: 'Registo' });
     },
 
     // Processa o formulário de registo
     async registerUser(req, res) {
         try {
             const { name, email, password } = req.body;
-            // Validação simples
+
             if (!name || !email || !password) {
-                return res.render('register', { error: 'Todos os campos são obrigatórios.' });
+                // 1. Define a mensagem de erro
+                req.flash('error', 'Todos os campos são obrigatórios.');
+                // 2. Redireciona de volta para a página de registo
+                return res.redirect('/cadastro');
             }
-            // Verifica se o utilizador já existe
+            
             const existingUser = await userModel.findByEmail(email);
             if (existingUser) {
-                return res.render('register', { error: 'Este e-mail já está em uso.' });
+                req.flash('error', 'Este e-mail já está em uso.');
+                return res.redirect('/cadastro');
             }
-            // Cria o utilizador (a encriptação é feita no model)
+            
             await userModel.create(name, email, password);
-            // Redireciona para a página de login após o sucesso
+
+            // Adiciona uma mensagem de sucesso!
+            req.flash('success', 'Conta criada com sucesso! Por favor, faça login.');
             res.redirect('/login');
+
         } catch (error) {
             console.error(error);
-            res.render('register', { error: 'Erro ao criar conta.' });
+            req.flash('error', 'Erro ao criar conta.');
+            res.redirect('/cadastro');
         }
     },
 
     // Mostra a página de login
     showLoginPage(req, res) {
-        // Renderiza o ficheiro ejs de login (ex: views/login.ejs)
+        // A página de login agora irá buscar mensagens de erro do flash
         res.render('login', { title: 'Login' });
     },
 
@@ -43,43 +50,48 @@ const authController = {
     async loginUser(req, res) {
         try {
             const { email, password } = req.body;
+
             if (!email || !password) {
-                return res.render('login', { error: 'Todos os campos são obrigatórios.' });
+                req.flash('error', 'Todos os campos são obrigatórios.');
+                return res.redirect('/login');
             }
-            // Encontra o utilizador
+            
             const user = await userModel.findByEmail(email);
             if (!user) {
-                return res.render('login', { error: 'E-mail ou senha inválidos.' });
+                req.flash('error', 'E-mail ou senha inválidos.');
+                return res.redirect('/login');
             }
-            // Compara a senha
+            
             const isMatch = await bcrypt.compare(password, user.password);
             if (!isMatch) {
-                return res.render('login', { error: 'E-mail ou senha inválidos.' });
+                req.flash('error', 'E-mail ou senha inválidos.');
+                return res.redirect('/login');
             }
-            // Inicia a sessão (Requer o 'express-session' configurado no app.js)
+            
             req.session.userId = user.id;
             req.session.userName = user.name;
-            // Redireciona para a área interna, ex: /dashboard
+            
+            // Adiciona uma mensagem de sucesso ao fazer login (opcional)
+            req.flash('success', `Bem-vindo de volta, ${user.name}!`);
             res.redirect('/dashboard');
+
         } catch (error) {
             console.error(error);
-            res.render('login', { error: 'Erro ao fazer login.' });
+            req.flash('error', 'Erro ao fazer login.');
+            res.redirect('/login');
         }
     },
 
     // Faz logout do utilizador
     logoutUser(req, res) {
-        // Destrói a sessão
         req.session.destroy(err => {
             if (err) {
-                return res.redirect('/dashboard'); // Se houver erro, fica na mesma
+                return res.redirect('/dashboard');
             }
-            // Limpa o cookie e redireciona para a home
-            res.clearCookie('connect.sid'); // O nome do cookie pode variar
+            res.clearCookie('connect.sid');
             res.redirect('/');
         });
     }
 };
 
 module.exports = authController;
-

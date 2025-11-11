@@ -3,9 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- Link para o ficheiro CSS -->
     <link rel="stylesheet" href="/css/style.css">
-    <!-- Título dinâmico da página -->
     <title><%= typeof title !== 'undefined' ? title + ' | Receitas.io' : 'Receitas.io' %></title>
 </head>
 <body>
@@ -32,6 +30,21 @@
     </header>
 
     <main class="container page-content">
+        
+        <!-- INÍCIO DA LÓGICA DAS MENSAGENS FLASH -->
+        <% if (successMessage && successMessage.length > 0) { %>
+            <div class="alert alert-success">
+                <%= successMessage[0] %>
+            </div>
+        <% } %>
+        
+        <% if (errorMessage && errorMessage.length > 0) { %>
+            <div class="alert alert-danger">
+                <%= errorMessage[0] %>
+            </div>
+        <% } %>
+        <!-- FIM DA LÓGICA DAS MENSAGENS FLASH -->
+
         <!-- O conteúdo específico de cada página será injetado aqui -->
         <%- body %>
     </main>
@@ -42,8 +55,6 @@
         </div>
     </footer>
     
-    <!-- Link opcional para JavaScript do frontend -->
-    <script src="/js/main.js"></script>
+    <!-- <script src="/js/main.js"></script> -->
 </body>
 </html>
-
