@@ -1,24 +1,20 @@
 const mysql = require('mysql2/promise');
-require('dotenv').config(); // Carrega as variáveis do .env
+require('dotenv').config();
 
-// Configurações de conexão, AGORA com o banco de dados especificado
 const dbConfig = {
     host: process.env.DB_HOST || 'localhost',
     user: process.env.DB_USER || 'root',
     port: process.env.DB_PORT || 3309,
     password: process.env.DB_PASSWORD || 'root',
-    database: process.env.DB_NAME || 'Gerenciador_Receitas' // <-- ESSENCIAL
+    database: process.env.DB_NAME || 'Gerenciador_Receitas'
 };
 
-// Função principal assíncrona para criar as tabelas
 async function createTables() {
     let connection;
     try {
-        // Conecta ao banco de dados 'Gerenciador_Receitas'
         connection = await mysql.createConnection(dbConfig);
         console.log('Conexão com o banco de dados bem-sucedida.');
 
-        // 1. Tabela de Usuários (Users)
         console.log('Criando tabela de Usuários...');
         await connection.query(`
             CREATE TABLE IF NOT EXISTS Users (
@@ -32,7 +28,6 @@ async function createTables() {
         `);
         console.log('Tabela de Usuários criada com sucesso.');
 
-        // 2. Tabela de Ingredientes (Ingredients) - A enciclopédia
         console.log('Criando tabela de Ingredientes...');
         await connection.query(`
             CREATE TABLE IF NOT EXISTS Ingredients (
@@ -46,7 +41,6 @@ async function createTables() {
         `);
         console.log('Tabela de Ingredientes criada com sucesso.');
 
-        // 3. Tabela de Receitas (Recipes)
         console.log('Criando tabela de Receitas...');
         await connection.query(`
             CREATE TABLE IF NOT EXISTS Recipes (
@@ -61,7 +55,6 @@ async function createTables() {
         `);
         console.log('Tabela de Receitas criada com sucesso.');
         
-        // 4. Tabela do Estoque Virtual (PantryItems)
         console.log('Criando tabela do Estoque Virtual...');
         await connection.query(`
             CREATE TABLE IF NOT EXISTS PantryItems (
@@ -76,7 +69,6 @@ async function createTables() {
         `);
         console.log('Tabela do Estoque Virtual criada com sucesso.');
 
-        // 5. Tabela de Junção (Muitos-para-Muitos): Ingredientes em uma Receita
         console.log('Criando tabela de junção RecipeIngredients...');
         await connection.query(`
             CREATE TABLE IF NOT EXISTS RecipeIngredients (
@@ -103,6 +95,5 @@ async function createTables() {
     }
 }
 
-// Executa a função
 createTables();
 

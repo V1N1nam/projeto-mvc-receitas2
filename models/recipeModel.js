@@ -1,8 +1,6 @@
-// Importa o pool de conexões
 const pool = require('../config/database');
 
 const recipeModel = {
-    // Cria uma nova receita (Nota: ingredientes são adicionados separadamente)
     async create(title, description, instructions, image_path, userId) {
         try {
             const query = `
@@ -17,7 +15,6 @@ const recipeModel = {
         }
     },
 
-    // Adiciona um ingrediente a uma receita (tabela de junção)
     async addIngredientToRecipe(recipeId, ingredientId, quantity, unit) {
         try {
             const query = `
@@ -32,7 +29,6 @@ const recipeModel = {
         }
     },
 
-    // Lista todas as receitas (pode ser melhorado com paginação)
     async findAll() {
         try {
             const query = 'SELECT * FROM Recipes ORDER BY id DESC';
@@ -44,7 +40,6 @@ const recipeModel = {
         }
     },
 
-    // Encontra uma receita específica pelo ID
     async findById(id) {
         try {
             const query = 'SELECT * FROM Recipes WHERE id = ?';
@@ -56,7 +51,6 @@ const recipeModel = {
         }
     },
 
-    // Encontra os ingredientes de uma receita específica
     async findIngredientsByRecipeId(recipeId) {
         try {
             const query = `
@@ -73,7 +67,6 @@ const recipeModel = {
         }
     },
 
-    // Remove uma receita (as entradas em RecipeIngredients serão removidas por causa do 'ON DELETE CASCADE')
     async delete(id) {
         try {
             const query = 'DELETE FROM Recipes WHERE id = ?';
@@ -85,7 +78,6 @@ const recipeModel = {
         }
     }
     
-    // Funções de UPDATE podem ser adicionadas aqui
 };
 
 module.exports = recipeModel;

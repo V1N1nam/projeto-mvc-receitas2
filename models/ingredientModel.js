@@ -1,8 +1,6 @@
-// Importa o pool de conexões
 const pool = require('../config/database');
 
 const ingredientModel = {
-    // Cria um novo ingrediente na "enciclopédia"
     async create(name, calories, proteins, carbs, fats) {
         try {
             const query = 'INSERT INTO Ingredients (name, calories, proteins, carbs, fats) VALUES (?, ?, ?, ?, ?)';
@@ -14,7 +12,6 @@ const ingredientModel = {
         }
     },
 
-    // Lista todos os ingredientes
     async findAll() {
         try {
             const query = 'SELECT * FROM Ingredients ORDER BY name';
@@ -26,7 +23,6 @@ const ingredientModel = {
         }
     },
 
-    // Encontra um ingrediente pelo ID
     async findById(id) {
         try {
             const query = 'SELECT * FROM Ingredients WHERE id = ?';
@@ -38,7 +34,6 @@ const ingredientModel = {
         }
     },
 
-    // Atualiza um ingrediente
     async update(id, name, calories, proteins, carbs, fats) {
         try {
             const query = `
@@ -54,7 +49,6 @@ const ingredientModel = {
         }
     },
 
-    // Remove um ingrediente
     async delete(id) {
         try {
             const query = 'DELETE FROM Ingredients WHERE id = ?';

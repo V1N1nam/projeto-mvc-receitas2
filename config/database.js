@@ -1,7 +1,6 @@
 const mysql = require('mysql2/promise');
 require('dotenv').config();
 
-// Este é o 'pool' de conexões que sua aplicação principal (Models) irá usar.
 const pool = mysql.createPool({
     host: process.env.DB_HOST || 'localhost',
     user: process.env.DB_USER || 'root',
@@ -13,9 +12,7 @@ const pool = mysql.createPool({
     queueLimit: 0
 });
 
-// Mensagem para confirmar que o pool foi criado (opcional, bom para depuração)
 console.log('Pool de conexões com o MySQL pronto para uso.');
 
-// Exportamos o 'pool' para que outros arquivos (principalmente os Models) possam usá-lo
 module.exports = pool;
 

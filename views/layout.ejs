@@ -12,15 +12,16 @@
             <a href="/" class="logo">Receitas.io</a>
             <nav>
                 <ul class="nav-links">
-                    <li><a href="/receitas">Explorar Receitas</a></li>
+                    <li><a href="/receitas">Receitas</a></li>
+                    <li><a href="/sobre">Sobre</a></li>
+                    <li><a href="/contato">Contato</a></li>
+                    
                     <% if (isAuthenticated) { %>
-                        <!-- Links para utilizadores logados -->
-                        <li><a href="/dashboard">Meu Painel</a></li>
-                        <li><a href="/estoque">Meu Estoque</a></li>
-                        <li><a href="/receitas/novo">Nova Receita</a></li>
-                        <li><a href="/logout">Logout (<%= userName %>)</a></li>
+                        <li><a href="/dashboard">Painel</a></li>
+                        <li><a href="/estoque">Estoque</a></li>
+                        <li><a href="/receitas/novo">Nova+</a></li>
+                        <li><a href="/logout">Sair (<%= userName %>)</a></li>
                     <% } else { %>
-                        <!-- Links para convidados -->
                         <li><a href="/login">Login</a></li>
                         <li><a href="/cadastro">Registo</a></li>
                     <% } %>
@@ -31,30 +32,31 @@
 
     <main class="container page-content">
         
-        <!-- INÍCIO DA LÓGICA DAS MENSAGENS FLASH -->
-        <% if (successMessage && successMessage.length > 0) { %>
+        <% if (typeof successMessage !== 'undefined' && successMessage && successMessage.length > 0) { %>
             <div class="alert alert-success">
                 <%= successMessage[0] %>
             </div>
         <% } %>
         
-        <% if (errorMessage && errorMessage.length > 0) { %>
+        <% if (typeof errorMessage !== 'undefined' && errorMessage && errorMessage.length > 0) { %>
             <div class="alert alert-danger">
                 <%= errorMessage[0] %>
             </div>
         <% } %>
-        <!-- FIM DA LÓGICA DAS MENSAGENS FLASH -->
 
-        <!-- O conteúdo específico de cada página será injetado aqui -->
         <%- body %>
     </main>
 
     <footer class="footer">
         <div class="container">
+            <div style="margin-bottom: 10px;">
+                <a href="/sobre" style="color: #ccc; margin: 0 10px; text-decoration: none;">Sobre Nós</a>
+                <a href="/contato" style="color: #ccc; margin: 0 10px; text-decoration: none;">Contato</a>
+                <a href="/trabalhe" style="color: #ccc; margin: 0 10px; text-decoration: none;">Trabalhe Conosco</a>
+            </div>
             <p>&copy; <%= new Date().getFullYear() %> Receitas.io. Todos os direitos reservados.</p>
         </div>
     </footer>
     
-    <!-- <script src="/js/main.js"></script> -->
 </body>
 </html>

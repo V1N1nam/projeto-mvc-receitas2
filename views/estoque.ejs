@@ -8,7 +8,6 @@
                 <% pantryItems.forEach(item => { %>
                     <li class="list-group-item">
                         <span><%= item.name %>: <%= item.quantity %> <%= item.unit %></span>
-                        <!-- Adicionar botões para editar quantidade ou remover -->
                         <a href="/estoque/remover/<%= item.id %>" class="btn btn-sm btn-danger float-right">Remover</a>
                     </li>
                 <% }) %>

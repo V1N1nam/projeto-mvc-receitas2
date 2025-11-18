@@ -20,7 +20,6 @@
                                     <span class="stock-status in-stock">(Em estoque ✓)</span>
                                 <% } else { %>
                                     <span class="stock-status out-of-stock">(Faltando X)</span>
-                                    <!-- Poderia adicionar botão "Adicionar à lista de compras" -->
                                 <% } %>
                             <% } %>
                         </li>
@@ -33,9 +32,8 @@
 
         <div class="recipe-instructions">
             <h3>Modo de Preparo</h3>
-            <p><%= recipe.instructions.replace(/\n/g, '<br>') %></p> <!-- Mostra quebras de linha -->
+            <p><%= recipe.instructions.replace(/\n/g, '<br>') %></p> 
         </div>
     </div>
     
-    <!-- Adicionar cálculo nutricional aqui no futuro -->
 </div>
