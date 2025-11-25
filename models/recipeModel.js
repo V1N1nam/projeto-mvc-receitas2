@@ -66,6 +66,7 @@ const recipeModel = {
     },
 
     async findById(id) {
+        
         try {
             const query = 'SELECT * FROM Recipes WHERE id = ?';
             const [rows] = await pool.query(query, [id]);

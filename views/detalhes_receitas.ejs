@@ -6,7 +6,14 @@
         <% } %>
         <p class="recipe-description"><%= recipe.description %></p>
         
-        <div style="margin-top: 20px; display: flex; gap: 10px; justify-content: center;">
+        <!-- BOTÕES DE AÇÃO -->
+        <div style="margin-top: 20px; display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
+            
+            <!-- NOVO: Botão de Download -->
+            <a href="/receitas/<%= recipe.id %>/download" class="btn btn-secondary" target="_blank">
+                📥 Baixar Receita (.txt)
+            </a>
+
             <a href="/receitas/<%= recipe.id %>/editar" class="btn btn-warning">Editar Receita</a>
             <a href="/receitas/remover/<%= recipe.id %>" class="btn btn-danger" onclick="return confirm('Tem certeza que deseja excluir esta receita? Esta ação não pode ser desfeita.')">Excluir Receita</a>
         </div>

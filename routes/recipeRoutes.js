@@ -5,12 +5,8 @@ const { isAuthenticated } = require('../middlewares/authMiddleware');
 const multer = require('multer');
 
 const storage = multer.diskStorage({
-    destination: (req, file, cb) => {
-        cb(null, 'public/uploads/');
-    },
-    filename: (req, file, cb) => {
-        cb(null, Date.now() + '-' + file.originalname);
-    }
+    destination: (req, file, cb) => cb(null, 'public/uploads/'),
+    filename: (req, file, cb) => cb(null, Date.now() + '-' + file.originalname)
 });
 const upload = multer({ storage: storage });
 
@@ -23,6 +19,9 @@ router.get('/:id/editar', isAuthenticated, recipeController.showEditForm);
 router.post('/:id/editar', isAuthenticated, upload.single('imagem'), recipeController.update);
 
 router.get('/remover/:id', isAuthenticated, recipeController.delete);
+
+// --- NOVA ROTA DE DOWNLOAD ---
+router.get('/:id/download', recipeController.downloadRecipe); // Adicione esta linha
 
 router.get('/:id', recipeController.getDetails);
 

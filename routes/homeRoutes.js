@@ -10,4 +10,4 @@ router.get('/trabalhe', homeController.careers);
 
 router.get('/dashboard', isAuthenticated, homeController.dashboard);
 
-module.exports = router;
+module.exports = router; 

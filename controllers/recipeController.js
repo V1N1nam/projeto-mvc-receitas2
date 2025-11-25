@@ -1,10 +1,49 @@
 const recipeModel = require('../models/recipeModel');
 const ingredientModel = require('../models/ingredientModel');
 const pantryItemModel = require('../models/pantryItemModel');
-const fs = require('fs'); 
+const fs = require('fs');
 
 const recipeController = {
+    // ... (outras funções: listAll, showCreateForm, create, showEditForm, update, delete) ...
 
+    // --- NOVA FUNÇÃO: Download de Receita ---
+    async downloadRecipe(req, res) {
+        try {
+            const { id } = req.params;
+            const recipe = await recipeModel.findById(id);
+            
+            if (!recipe) return res.status(404).send('Receita não encontrada.');
+
+            const ingredients = await recipeModel.findIngredientsByRecipeId(id);
+
+            // Monta o conteúdo do arquivo de texto
+            let content = `RECEITA: ${recipe.title.toUpperCase()}\n`;
+            content += `====================================\n\n`;
+            content += `DESCRIÇÃO:\n${recipe.description}\n\n`;
+            content += `INGREDIENTES:\n`;
+            
+            ingredients.forEach(ing => {
+                content += `- ${ing.quantity} ${ing.unit} de ${ing.name}\n`;
+            });
+
+            content += `\nMODO DE PREPARO:\n`;
+            content += `${recipe.instructions}\n`;
+            content += `\n\nGerado por Receitas.io`;
+
+            // Configura o cabeçalho para forçar o download
+            res.setHeader('Content-disposition', `attachment; filename=${recipe.title.replace(/ /g, '_')}.txt`);
+            res.setHeader('Content-type', 'text/plain');
+            
+            // Envia o conteúdo
+            res.send(content);
+
+        } catch (error) {
+            console.error(error);
+            res.status(500).send('Erro ao gerar download.');
+        }
+    },
+
+    // ... (função getDetails) ...
     async listAll(req, res) {
         try {
             const recipes = await recipeModel.findAll();
@@ -35,7 +74,7 @@ const recipeController = {
 
         } catch (error) {
             console.error(error);
-            res.status(500).send('Erro ao carregar o formulário.');
+            res.status(500).send('Erro ao carregar formulário.');
         }
     },
 
@@ -43,25 +82,19 @@ const recipeController = {
         try {
             const { title, description, instructions } = req.body;
             const userId = req.session.userId;
-            
             const image_path = req.file ? `/uploads/${req.file.filename}` : null;
 
             const newRecipe = await recipeModel.create(title, description, instructions, image_path, userId);
             
             const { ingredientIds, quantities, units } = req.body;
             if (ingredientIds) {
-                const ingredientsArray = Array.isArray(ingredientIds) ? ingredientIds : [ingredientIds];
-                const quantitiesArray = Array.isArray(quantities) ? quantities : [quantities];
-                const unitsArray = Array.isArray(units) ? units : [units];
+                const ids = Array.isArray(ingredientIds) ? ingredientIds : [ingredientIds];
+                const qtds = Array.isArray(quantities) ? quantities : [quantities];
+                const uns = Array.isArray(units) ? units : [units];
 
-                for (let i = 0; i < ingredientsArray.length; i++) {
-                    if(ingredientsArray[i] && quantitiesArray[i] && unitsArray[i]) {
-                        await recipeModel.addIngredientToRecipe(
-                            newRecipe.id, 
-                            ingredientsArray[i], 
-                            quantitiesArray[i], 
-                            unitsArray[i]
-                        );
+                for (let i = 0; i < ids.length; i++) {
+                    if(ids[i] && qtds[i] && uns[i]) {
+                        await recipeModel.addIngredientToRecipe(newRecipe.id, ids[i], qtds[i], uns[i]);
                     }
                 }
             }
@@ -110,7 +143,7 @@ const recipeController = {
 
         } catch (error) {
             console.error(error);
-            res.status(500).send('Erro ao carregar formulário de edição.');
+            res.status(500).send('Erro ao carregar edição.');
         }
     },
 
@@ -131,7 +164,7 @@ const recipeController = {
                     try {
                         const oldPath = `public${image_path}`;
                         if (fs.existsSync(oldPath)) fs.unlinkSync(oldPath);
-                    } catch(e) { console.error("Erro ao apagar imagem antiga", e); }
+                    } catch(e) { console.error(e); }
                 }
                 image_path = `/uploads/${req.file.filename}`;
             }
@@ -141,18 +174,13 @@ const recipeController = {
 
             const { ingredientIds, quantities, units } = req.body;
             if (ingredientIds) {
-                const ingredientsArray = Array.isArray(ingredientIds) ? ingredientIds : [ingredientIds];
-                const quantitiesArray = Array.isArray(quantities) ? quantities : [quantities];
-                const unitsArray = Array.isArray(units) ? units : [units];
+                const ids = Array.isArray(ingredientIds) ? ingredientIds : [ingredientIds];
+                const qtds = Array.isArray(quantities) ? quantities : [quantities];
+                const uns = Array.isArray(units) ? units : [units];
 
-                for (let i = 0; i < ingredientsArray.length; i++) {
-                    if(ingredientsArray[i] && quantitiesArray[i] && unitsArray[i]) {
-                        await recipeModel.addIngredientToRecipe(
-                            recipeId, 
-                            ingredientsArray[i], 
-                            quantitiesArray[i], 
-                            unitsArray[i]
-                        );
+                for (let i = 0; i < ids.length; i++) {
+                    if(ids[i] && qtds[i] && uns[i]) {
+                        await recipeModel.addIngredientToRecipe(recipeId, ids[i], qtds[i], uns[i]);
                     }
                 }
             }
@@ -178,17 +206,15 @@ const recipeController = {
                 return res.redirect('/receitas');
             }
             if (recipe.userId !== userId) {
-                req.flash('error', 'Você não tem permissão para excluir esta receita.');
+                req.flash('error', 'Sem permissão.');
                 return res.redirect(`/receitas/${recipeId}`);
             }
 
             if (recipe.image_path) {
                 try {
                     const fullPath = `public${recipe.image_path}`;
-                    if (fs.existsSync(fullPath)) {
-                        fs.unlinkSync(fullPath);
-                    }
-                } catch(e) { console.error("Erro ao apagar imagem", e); }
+                    if (fs.existsSync(fullPath)) fs.unlinkSync(fullPath);
+                } catch(e) { console.error(e); }
             }
 
             await recipeModel.delete(recipeId);
@@ -208,12 +234,9 @@ const recipeController = {
             const userId = req.session.userId || null;
 
             const recipe = await recipeModel.findById(recipeId);
-            if (!recipe) {
-                return res.status(404).send('Receita não encontrada.');
-            }
+            if (!recipe) return res.status(404).send('Receita não encontrada.');
             
             const recipeIngredients = await recipeModel.findIngredientsByRecipeId(recipeId);
-            
             let ingredientsWithStockInfo = recipeIngredients.map(ing => ({ ...ing, inStock: false }));
 
             if (userId) {
@@ -234,10 +257,9 @@ const recipeController = {
                 ingredients: ingredientsWithStockInfo, 
                 title: recipe.title 
             });
-
         } catch (error) {
             console.error(error);
-            res.status(500).send('Erro ao carregar detalhes da receita.');
+            res.status(500).send('Erro ao carregar detalhes.');
         }
     }
 };
