@@ -4,9 +4,8 @@ const pantryItemModel = require('../models/pantryItemModel');
 const fs = require('fs');
 
 const recipeController = {
-    // ... (outras funções: listAll, showCreateForm, create, showEditForm, update, delete) ...
 
-    // --- NOVA FUNÇÃO: Download de Receita ---
+
     async downloadRecipe(req, res) {
         try {
             const { id } = req.params;
@@ -16,7 +15,6 @@ const recipeController = {
 
             const ingredients = await recipeModel.findIngredientsByRecipeId(id);
 
-            // Monta o conteúdo do arquivo de texto
             let content = `RECEITA: ${recipe.title.toUpperCase()}\n`;
             content += `====================================\n\n`;
             content += `DESCRIÇÃO:\n${recipe.description}\n\n`;
@@ -30,11 +28,9 @@ const recipeController = {
             content += `${recipe.instructions}\n`;
             content += `\n\nGerado por Receitas.io`;
 
-            // Configura o cabeçalho para forçar o download
             res.setHeader('Content-disposition', `attachment; filename=${recipe.title.replace(/ /g, '_')}.txt`);
             res.setHeader('Content-type', 'text/plain');
-            
-            // Envia o conteúdo
+
             res.send(content);
 
         } catch (error) {
@@ -43,7 +39,7 @@ const recipeController = {
         }
     },
 
-    // ... (função getDetails) ...
+
     async listAll(req, res) {
         try {
             const recipes = await recipeModel.findAll();

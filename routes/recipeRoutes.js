@@ -20,8 +20,7 @@ router.post('/:id/editar', isAuthenticated, upload.single('imagem'), recipeContr
 
 router.get('/remover/:id', isAuthenticated, recipeController.delete);
 
-// --- NOVA ROTA DE DOWNLOAD ---
-router.get('/:id/download', recipeController.downloadRecipe); // Adicione esta linha
+router.get('/:id/download', recipeController.downloadRecipe);
 
 router.get('/:id', recipeController.getDetails);
 

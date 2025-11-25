@@ -6,10 +6,8 @@
         <% } %>
         <p class="recipe-description"><%= recipe.description %></p>
         
-        <!-- BOTÕES DE AÇÃO -->
         <div style="margin-top: 20px; display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
             
-            <!-- NOVO: Botão de Download -->
             <a href="/receitas/<%= recipe.id %>/download" class="btn btn-secondary" target="_blank">
                 📥 Baixar Receita (.txt)
             </a>
