@@ -1,5 +1,5 @@
 const authMiddleware = {
-    
+    // Verifica se o utilizador está com sessão iniciada
     isAuthenticated: (req, res, next) => {
         if (req.session.userId) {
             return next();
@@ -8,6 +8,7 @@ const authMiddleware = {
         }
     },
 
+    // Verifica se o utilizador já está logado (para páginas de login/registo)
     isGuest: (req, res, next) => {
         if (req.session.userId) {
             res.redirect('/dashboard');
@@ -18,4 +19,3 @@ const authMiddleware = {
 };
 
 module.exports = authMiddleware;
-

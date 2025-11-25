@@ -1,6 +1,8 @@
+// Importa o pool de conexões
 const pool = require('../config/database');
 
 const recipeModel = {
+    // Cria uma nova receita
     async create(title, description, instructions, image_path, userId) {
         try {
             const query = `
@@ -15,6 +17,38 @@ const recipeModel = {
         }
     },
 
+    // --- NOVAS FUNÇÕES PARA SUPORTAR EDIÇÃO ---
+
+    // Atualiza os dados básicos da receita
+    async update(id, title, description, instructions, image_path) {
+        try {
+            const query = `
+                UPDATE Recipes 
+                SET title = ?, description = ?, instructions = ?, image_path = ?
+                WHERE id = ?
+            `;
+            await pool.query(query, [title, description, instructions, image_path, id]);
+            return { id };
+        } catch (error) {
+            console.error('Erro ao atualizar receita:', error);
+            throw error;
+        }
+    },
+
+    // Remove TODOS os ingredientes de uma receita (para limpar antes de adicionar os novos na edição)
+    async removeAllIngredientsFromRecipe(recipeId) {
+        try {
+            const query = 'DELETE FROM RecipeIngredients WHERE recipeId = ?';
+            await pool.query(query, [recipeId]);
+        } catch (error) {
+            console.error('Erro ao limpar ingredientes da receita:', error);
+            throw error;
+        }
+    },
+
+    // --- FIM ---
+
+    // Adiciona um ingrediente a uma receita (tabela de junção)
     async addIngredientToRecipe(recipeId, ingredientId, quantity, unit) {
         try {
             const query = `
@@ -29,6 +63,7 @@ const recipeModel = {
         }
     },
 
+    // Lista todas as receitas
     async findAll() {
         try {
             const query = 'SELECT * FROM Recipes ORDER BY id DESC';
@@ -40,6 +75,7 @@ const recipeModel = {
         }
     },
 
+    // Encontra uma receita específica pelo ID
     async findById(id) {
         try {
             const query = 'SELECT * FROM Recipes WHERE id = ?';
@@ -51,10 +87,12 @@ const recipeModel = {
         }
     },
 
+    // Encontra os ingredientes de uma receita específica
+    // MODIFICADO: Agora retorna também o 'ingredientId' (necessário para o formulário de edição)
     async findIngredientsByRecipeId(recipeId) {
         try {
             const query = `
-                SELECT i.name, ri.quantity, ri.unit, i.calories, i.proteins, i.carbs, i.fats
+                SELECT i.name, ri.quantity, ri.unit, i.calories, i.proteins, i.carbs, i.fats, ri.ingredientId
                 FROM RecipeIngredients ri
                 JOIN Ingredients i ON ri.ingredientId = i.id
                 WHERE ri.recipeId = ?
@@ -67,6 +105,7 @@ const recipeModel = {
         }
     },
 
+    // Remove uma receita
     async delete(id) {
         try {
             const query = 'DELETE FROM Recipes WHERE id = ?';
@@ -77,7 +116,6 @@ const recipeModel = {
             throw error;
         }
     }
-    
 };
 
 module.exports = recipeModel;

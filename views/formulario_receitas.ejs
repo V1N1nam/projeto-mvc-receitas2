@@ -1,8 +1,6 @@
 <h2><%= typeof recipe !== 'undefined' ? 'Editar Receita' : 'Criar Nova Receita' %></h2>
 
-
 <form action="<%= typeof recipe !== 'undefined' ? '/receitas/' + recipe.id + '/editar' : '/receitas/novo' %>" method="POST" enctype="multipart/form-data">
-    
     <div class="form-group">
         <label for="title">Título da Receita:</label>
         <input type="text" id="title" name="title" value="<%= typeof recipe !== 'undefined' ? recipe.title : '' %>" required>
@@ -29,21 +27,55 @@
     <hr>
     <h3>Ingredientes:</h3>
     <div id="ingredients-list">
-        <div class="ingredient-item">
-            <select name="ingredientIds[]" required>
-                <option value="">-- Selecione o Ingrediente --</option>
-                <% if (ingredients && ingredients.length > 0) { %>
-                    <% ingredients.forEach(ing => { %>
-                        <option value="<%= ing.id %>"><%= ing.name %></option>
-                    <% }) %>
-                <% } %>
-            </select>
-            <input type="number" name="quantities[]" placeholder="Quantidade" step="any" required>
-            <input type="text" name="units[]" placeholder="Unidade (ex: g, ml, xícara)" required>
-            <button type="button" class="btn-remove-ingredient" onclick="removeIngredient(this)">Remover</button>
-        </div>
+        <% 
+        let initialIngredients = [];
+        if (typeof recipeIngredients !== 'undefined' && recipeIngredients.length > 0) {
+            initialIngredients = recipeIngredients;
+        } else {
+            initialIngredients = [{ ingredientId: '', quantity: '', unit: '' }];
+        }
+        %>
+
+        <% initialIngredients.forEach(item => { %>
+            <div class="ingredient-item">
+                <select name="ingredientIds[]" required onchange="autoSelectUnit(this)">
+                    <option value="">-- Ingrediente --</option>
+                    <% if (ingredients && ingredients.length > 0) { %>
+                        <% ingredients.forEach(ing => { %>
+                            <option value="<%= ing.id %>" <%= item.ingredientId == ing.id ? 'selected' : '' %> >
+                                <%= ing.name %>
+                            </option>
+                        <% }) %>
+                    <% } %>
+                </select>
+                <input type="number" name="quantities[]" placeholder="Qtd" step="any" value="<%= item.quantity %>" required style="max-width: 100px;">
+                
+                <select name="units[]" required style="max-width: 150px;">
+                    <option value="">-- Unid. --</option>
+                    <optgroup label="Peso">
+                        <option value="g" <%= item.unit === 'g' ? 'selected' : '' %>>g</option>
+                        <option value="kg" <%= item.unit === 'kg' ? 'selected' : '' %>>kg</option>
+                    </optgroup>
+                    <optgroup label="Volume">
+                        <option value="ml" <%= item.unit === 'ml' ? 'selected' : '' %>>ml</option>
+                        <option value="l" <%= item.unit === 'l' ? 'selected' : '' %>>l</option>
+                    </optgroup>
+                    <optgroup label="Outros">
+                        <option value="un" <%= item.unit === 'un' ? 'selected' : '' %>>un</option>
+                        <option value="xic" <%= item.unit === 'xic' ? 'selected' : '' %>>xícara</option>
+                        <option value="col_sopa" <%= item.unit === 'col_sopa' ? 'selected' : '' %>>col. sopa</option>
+                        <option value="col_cha" <%= item.unit === 'col_cha' ? 'selected' : '' %>>col. chá</option>
+                    </optgroup>
+                </select>
+
+                <button type="button" class="btn-remove-ingredient" onclick="removeIngredient(this)">Remover</button>
+            </div>
+        <% }) %>
+
     </div>
-    <button type="button" class="btn btn-secondary" onclick="addIngredient()">Adicionar Ingrediente</button>
+    <!-- O botão agora chama a função do JS externo -->
+    <!-- Precisamos passar os ingredientes para o JS. Faremos isso via variável global temporária abaixo -->
+    <button type="button" class="btn btn-secondary" id="btnAddIngredient">Adicionar Ingrediente</button>
     <hr>
 
     <button type="submit" class="btn btn-primary">
@@ -51,40 +83,17 @@
     </button>
 </form>
 
+<script src="/js/receitas.js"></script>
 <script>
-    function addIngredient() {
-        const list = document.getElementById('ingredients-list');
-        const newItem = document.createElement('div');
-        newItem.classList.add('ingredient-item');
-        
-        const selectHTML = `
-            <select name="ingredientIds[]" required>
-                <option value="">-- Selecione o Ingrediente --</option>
-                <% if (ingredients && ingredients.length > 0) { %>
-                    <% ingredients.forEach(ing => { %>
-                        <option value="<%= ing.id %>"><%= ing.name %></option>
-                    <% }) %>
-                <% } %>
-            </select>
-        `;
-        
-        newItem.innerHTML = `
-            ${selectHTML}
-            <input type="number" name="quantities[]" placeholder="Quantidade" step="any" required>
-            <input type="text" name="units[]" placeholder="Unidade (ex: g, ml, xícara)" required>
-            <button type="button" class="btn-remove-ingredient" onclick="removeIngredient(this)">Remover</button>
-        `;
-        list.appendChild(newItem);
-    }
+    // Inicialização: Passa dados do servidor para o script externo
+    const serverPantryUnits = <%- typeof pantryUnits !== 'undefined' ? pantryUnits : '{}' %>;
+    const serverIngredients = <%- JSON.stringify(ingredients) %>; // Passa a lista completa de ingredientes
 
-    function removeIngredient(button) {
-        const list = document.getElementById('ingredients-list');
-        if (list.children.length > 1) {
-            button.closest('.ingredient-item').remove();
-        } else {
-            const item = button.closest('.ingredient-item');
-            item.querySelector('select').value = "";
-            item.querySelectorAll('input').forEach(input => input.value = "");
-        }
-    }
+    // Inicializa o script externo
+    initRecipeForm(serverPantryUnits);
+
+    // Configura o botão de adicionar (para evitar onclick inline complexo)
+    document.getElementById('btnAddIngredient').addEventListener('click', function() {
+        addIngredient(serverIngredients);
+    });
 </script>

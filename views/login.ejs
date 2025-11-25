@@ -1,6 +1,5 @@
 <div class="auth-form-container">
     <h2>Login</h2>
-    
 
     <form action="/login" method="POST">
         <div class="form-group">
@@ -11,8 +10,12 @@
             <label for="password">Senha:</label>
             <input type="password" id="password" name="password" required>
         </div>
+        
+        <div class="form-group" style="display: flex; align-items: center; gap: 10px;">
+            <input type="checkbox" id="remember" name="remember" style="width: auto;">
+            <label for="remember" style="margin: 0; font-weight: normal;">Lembrar senha</label>
+        </div>
         <button type="submit" class="btn btn-primary">Login</button>
     </form>
-    <p class="auth-switch">Não tem uma conta?
-    <a href="/cadastro">Registe-se aqui</a>.</p>
+    <p class="auth-switch">Não tem uma conta? <a href="/cadastro">Registe-se aqui</a>.</p>
 </div>

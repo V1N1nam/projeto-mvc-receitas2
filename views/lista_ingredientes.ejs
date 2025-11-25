@@ -6,9 +6,9 @@
         <tr>
             <th>Nome</th>
             <th>Calorias (100g)</th>
-            <th>Proteínas (100g)</th>
-            <th>Carboidratos (100g)</th>
-            <th>Gorduras (100g)</th>
+            <th>Proteínas</th>
+            <th>Carboidratos</th>
+            <th>Gorduras</th>
             <th>Ações</th>
         </tr>
     </thead>
@@ -17,18 +17,22 @@
             <% ingredients.forEach(ing => { %>
                 <tr>
                     <td><%= ing.name %></td>
-                    <td><%= ing.calories || 'N/A' %></td>
-                    <td><%= ing.proteins || 'N/A' %></td>
-                    <td><%= ing.carbs || 'N/A' %></td>
-                    <td><%= ing.fats || 'N/A' %></td>
+                    <td><%= ing.calories || '0' %></td>
+                    <td><%= ing.proteins || '0' %>g</td>
+                    <td><%= ing.carbs || '0' %>g</td>
+                    <td><%= ing.fats || '0' %>g</td>
                     <td>
+                        <!-- Botão de Editar -->
                         <a href="/ingredientes/<%= ing.id %>/editar" class="btn btn-sm btn-warning">Editar</a>
+                        
+                        <!-- Botão de Excluir (NOVO) -->
+                        <a href="/ingredientes/remover/<%= ing.id %>" class="btn btn-sm btn-danger" onclick="return confirm('Tem certeza que deseja excluir este ingrediente? Isso pode afetar receitas que o utilizam.')">Excluir</a>
                     </td>
                 </tr>
             <% }) %>
         <% } else { %>
             <tr>
-                <td colspan="6">Nenhum ingrediente cadastrado.</td>
+                <td colspan="6" style="text-align: center;">Nenhum ingrediente cadastrado.</td>
             </tr>
         <% } %>
     </tbody>

@@ -6,43 +6,126 @@
         <% if (pantryItems && pantryItems.length > 0) { %>
             <ul class="list-group">
                 <% pantryItems.forEach(item => { %>
-                    <li class="list-group-item">
-                        <span><%= item.name %>: <%= item.quantity %> <%= item.unit %></span>
-                        <a href="/estoque/remover/<%= item.id %>" class="btn btn-sm btn-danger float-right">Remover</a>
+                    <li class="list-group-item" id="item-<%= item.id %>">
+                        
+                        <!-- MODO VISUALIZAÇÃO -->
+                        <div class="view-mode" style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                            <div>
+                                <strong><%= item.name %></strong>
+                                <span class="text-muted">(<%= item.unit %>)</span>
+                                <span style="margin: 0 10px;">→</span>
+                                <span style="font-weight: bold; font-size: 1.1em;"><%= item.quantity %></span>
+                            </div>
+                            <div class="btn-group">
+                                <button type="button" class="btn btn-sm btn-warning" onclick="toggleEdit('<%= item.id %>')">
+                                    Editar
+                                </button>
+                                <a href="/estoque/remover/<%= item.id %>" class="btn btn-sm btn-danger" onclick="return confirm('Tem certeza que deseja remover este item?')">
+                                    Excluir
+                                </a>
+                            </div>
+                        </div>
+
+                        <!-- MODO EDIÇÃO -->
+                        <div class="edit-mode" style="display: none; width: 100%; background-color: #f9f9f9; padding: 10px; border-radius: 5px;">
+                            <form action="/estoque/atualizar/<%= item.id %>" method="POST" style="display: flex; align-items: center; flex-wrap: wrap; gap: 10px; width: 100%;">
+                                
+                                <div style="flex: 1; min-width: 150px;">
+                                    <label for="ing-<%= item.id %>" style="margin:0; font-size: 0.8em; display:block;">Item:</label>
+                                    <select id="ing-<%= item.id %>" name="ingredientId" style="width: 100%; padding: 5px; border: 1px solid #ccc; border-radius: 4px;" required>
+                                        <% if (ingredients && ingredients.length > 0) { %>
+                                            <% ingredients.forEach(ing => { %>
+                                                <option value="<%= ing.id %>" <%= ing.id === item.ingredientId ? 'selected' : '' %> >
+                                                    <%= ing.name %>
+                                                </option>
+                                            <% }) %>
+                                        <% } %>
+                                    </select>
+                                </div>
+                                
+                                <div style="display: flex; align-items: center; gap: 5px;">
+                                    <label for="qtd-<%= item.id %>" style="margin:0; font-size: 0.8em;">Qtd:</label>
+                                    <input type="number" id="qtd-<%= item.id %>" name="quantity" value="<%= item.quantity %>" step="any" style="width: 70px; padding: 5px; border: 1px solid #ccc; border-radius: 4px;" required>
+                                </div>
+
+                                <div style="display: flex; align-items: center; gap: 5px;">
+                                    <label for="unit-<%= item.id %>" style="margin:0; font-size: 0.8em;">Unid:</label>
+                                    <select id="unit-<%= item.id %>" name="unit" style="width: 90px; padding: 5px; border: 1px solid #ccc; border-radius: 4px;" required>
+                                        <option value="g" <%= item.unit === 'g' ? 'selected' : '' %>>g</option>
+                                        <option value="kg" <%= item.unit === 'kg' ? 'selected' : '' %>>kg</option>
+                                        <option value="ml" <%= item.unit === 'ml' ? 'selected' : '' %>>ml</option>
+                                        <option value="l" <%= item.unit === 'l' ? 'selected' : '' %>>l</option>
+                                        <option value="un" <%= item.unit === 'un' ? 'selected' : '' %>>un</option>
+                                        <option value="xic" <%= item.unit === 'xic' ? 'selected' : '' %>>xícara</option>
+                                        <option value="col_sopa" <%= item.unit === 'col_sopa' ? 'selected' : '' %>>col. sopa</option>
+                                        <option value="col_cha" <%= item.unit === 'col_cha' ? 'selected' : '' %>>col. chá</option>
+                                    </select>
+                                </div>
+
+                                <div class="btn-group" style="margin-left: auto; margin-top: 15px;">
+                                    <button type="submit" class="btn btn-sm btn-success">Salvar</button>
+                                    <button type="button" class="btn btn-sm btn-secondary" onclick="toggleEdit('<%= item.id %>')">Cancelar</button>
+                                </div>
+                            </form>
+                        </div>
+
                     </li>
                 <% }) %>
             </ul>
         <% } else { %>
-            <p>O seu estoque está vazio.</p>
+            <div class="alert alert-info">
+                O seu estoque está vazio. Adicione itens usando o formulário ao lado.
+            </div>
         <% } %>
     </div>
 
     <div class="pantry-add-form">
-        <h3>Adicionar Item ao Estoque</h3>
-        <% if (typeof error !== 'undefined' && error) { %>
-             <div class="alert alert-danger"><%= error %></div>
-        <% } %>
-        <form action="/estoque/adicionar" method="POST">
-            <div class="form-group">
-                <label for="ingredientId">Ingrediente:</label>
-                <select id="ingredientId" name="ingredientId" required>
-                    <option value="">-- Selecione --</option>
-                    <% if (ingredients && ingredients.length > 0) { %>
-                        <% ingredients.forEach(ing => { %>
-                            <option value="<%= ing.id %>"><%= ing.name %></option>
-                        <% }) %>
-                    <% } %>
-                </select>
-            </div>
-            <div class="form-group">
-                <label for="quantity">Quantidade:</label>
-                <input type="number" id="quantity" name="quantity" step="any" required>
-            </div>
-            <div class="form-group">
-                <label for="unit">Unidade:</label>
-                <input type="text" id="unit" name="unit" placeholder="g, ml, unidade, etc." required>
-            </div>
-            <button type="submit" class="btn btn-primary">Adicionar ao Estoque</button>
-        </form>
+        <div style="background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); position: sticky; top: 20px;">
+            <h3 style="margin-top: 0;">Adicionar Novo Item</h3>
+            <hr>
+            <form action="/estoque/adicionar" method="POST">
+                <div class="form-group">
+                    <label for="ingredientId">Ingrediente:</label>
+                    <select id="ingredientId" name="ingredientId" required>
+                        <option value="">-- Selecione --</option>
+                        <% if (ingredients && ingredients.length > 0) { %>
+                            <% ingredients.forEach(ing => { %>
+                                <option value="<%= ing.id %>"><%= ing.name %></option>
+                            <% }) %>
+                        <% } %>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="quantity">Quantidade:</label>
+                    <input type="number" id="quantity" name="quantity" step="any" placeholder="0.00" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="unit">Unidade:</label>
+                    <select id="unit" name="unit" required>
+                        <option value="">-- Selecione --</option>
+                        <optgroup label="Peso">
+                            <option value="g">g (Gramas)</option>
+                            <option value="kg">kg (Quilogramas)</option>
+                        </optgroup>
+                        <optgroup label="Volume">
+                            <option value="ml">ml (Mililitros)</option>
+                            <option value="l">l (Litros)</option>
+                        </optgroup>
+                        <optgroup label="Medidas Caseiras">
+                            <option value="un">un (Unidade)</option>
+                            <option value="xic">xíc (Xícara)</option>
+                            <option value="col_sopa">col. sopa</option>
+                            <option value="col_cha">col. chá</option>
+                        </optgroup>
+                    </select>
+                </div>
+                
+                <button type="submit" class="btn btn-primary" style="width: 100%;">+ Adicionar ao Estoque</button>
+            </form>
+        </div>
     </div>
 </div>
+
+<!-- Link para o script externo -->
+<script src="/js/estoque.js"></script>

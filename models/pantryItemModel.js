@@ -1,16 +1,21 @@
+// Importa o pool de conexões
 const pool = require('../config/database');
 
 const pantryItemModel = {
+    // Adiciona um item ao estoque de um utilizador
     async addItem(userId, ingredientId, quantity, unit) {
         try {
+            // Verifica se o item já existe para este utilizador
             const checkQuery = 'SELECT * FROM PantryItems WHERE userId = ? AND ingredientId = ?';
             const [existing] = await pool.query(checkQuery, [userId, ingredientId]);
 
             if (existing.length > 0) {
+                // Se existe, atualiza a quantidade (soma)
                 const updateQuery = 'UPDATE PantryItems SET quantity = quantity + ? WHERE id = ?';
                 await pool.query(updateQuery, [quantity, existing[0].id]);
                 return { id: existing[0].id };
             } else {
+                // Se não existe, insere um novo
                 const insertQuery = 'INSERT INTO PantryItems (userId, ingredientId, quantity, unit) VALUES (?, ?, ?, ?)';
                 const [result] = await pool.query(insertQuery, [userId, ingredientId, quantity, unit]);
                 return { id: result.insertId };
@@ -21,6 +26,7 @@ const pantryItemModel = {
         }
     },
 
+    // Lista todos os itens no estoque de um utilizador
     async findByUserId(userId) {
         try {
             const query = `
@@ -37,17 +43,19 @@ const pantryItemModel = {
         }
     },
 
-    async updateQuantity(pantryItemId, newQuantity) {
+    // --- ATUALIZADO: Edita Quantidade E Unidade ---
+    async update(id, quantity, unit) {
         try {
-            const query = 'UPDATE PantryItems SET quantity = ? WHERE id = ?';
-            await pool.query(query, [newQuantity, pantryItemId]);
-            return { id: pantryItemId };
+            const query = 'UPDATE PantryItems SET quantity = ?, unit = ? WHERE id = ?';
+            await pool.query(query, [quantity, unit, id]);
+            return { id };
         } catch (error) {
-            console.error('Erro ao atualizar quantidade do estoque:', error);
+            console.error('Erro ao atualizar item do estoque:', error);
             throw error;
         }
     },
 
+    // Remove um item do estoque
     async delete(pantryItemId) {
         try {
             const query = 'DELETE FROM PantryItems WHERE id = ?';
