@@ -1,5 +1,3 @@
-// Variável global para armazenar as unidades do estoque
-// Será preenchida na view antes deste script rodar ou via data-attributes
 let pantryUnits = {};
 
 function initRecipeForm(unitsData) {
@@ -9,12 +7,10 @@ function initRecipeForm(unitsData) {
 function autoSelectUnit(selectElement) {
     const ingredientId = selectElement.value;
     
-    // Se houver uma unidade cadastrada para este ingrediente no estoque
     if (pantryUnits[ingredientId]) {
         const row = selectElement.closest('.ingredient-item');
         const unitSelect = row.querySelector('select[name="units[]"]');
         
-        // Define o valor do select de unidade, APENAS se o campo estiver vazio
         if (unitSelect.value === "") {
             unitSelect.value = pantryUnits[ingredientId];
         }
@@ -26,7 +22,7 @@ function addIngredient(ingredientsData) {
     const newItem = document.createElement('div');
     newItem.classList.add('ingredient-item');
     
-    // Constrói as opções do select baseadas nos dados recebidos
+
     let ingredientOptions = '';
     if (ingredientsData && ingredientsData.length > 0) {
         ingredientsData.forEach(ing => {
@@ -39,7 +35,7 @@ function addIngredient(ingredientsData) {
             <option value="">-- Ingrediente --</option>
             ${ingredientOptions}
         </select>
-        <input type="number" name="quantities[]" placeholder="Qtd" step="any" required style="max-width: 100px;">
+        <input type="number" name="quantities[]" placeholder="Qtd" min="0" step="any" required style="max-width: 100px;">
         <select name="units[]" required style="max-width: 150px;">
             <option value="">-- Unid. --</option>
             <optgroup label="Peso">

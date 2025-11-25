@@ -73,8 +73,6 @@
         <% }) %>
 
     </div>
-    <!-- O botão agora chama a função do JS externo -->
-    <!-- Precisamos passar os ingredientes para o JS. Faremos isso via variável global temporária abaixo -->
     <button type="button" class="btn btn-secondary" id="btnAddIngredient">Adicionar Ingrediente</button>
     <hr>
 
@@ -85,14 +83,11 @@
 
 <script src="/js/receitas.js"></script>
 <script>
-    // Inicialização: Passa dados do servidor para o script externo
     const serverPantryUnits = <%- typeof pantryUnits !== 'undefined' ? pantryUnits : '{}' %>;
-    const serverIngredients = <%- JSON.stringify(ingredients) %>; // Passa a lista completa de ingredientes
+    const serverIngredients = <%- JSON.stringify(ingredients) %>; 
 
-    // Inicializa o script externo
     initRecipeForm(serverPantryUnits);
 
-    // Configura o botão de adicionar (para evitar onclick inline complexo)
     document.getElementById('btnAddIngredient').addEventListener('click', function() {
         addIngredient(serverIngredients);
     });

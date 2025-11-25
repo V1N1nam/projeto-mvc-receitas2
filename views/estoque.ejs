@@ -8,7 +8,6 @@
                 <% pantryItems.forEach(item => { %>
                     <li class="list-group-item" id="item-<%= item.id %>">
                         
-                        <!-- MODO VISUALIZAÇÃO -->
                         <div class="view-mode" style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
                             <div>
                                 <strong><%= item.name %></strong>
@@ -26,7 +25,6 @@
                             </div>
                         </div>
 
-                        <!-- MODO EDIÇÃO -->
                         <div class="edit-mode" style="display: none; width: 100%; background-color: #f9f9f9; padding: 10px; border-radius: 5px;">
                             <form action="/estoque/atualizar/<%= item.id %>" method="POST" style="display: flex; align-items: center; flex-wrap: wrap; gap: 10px; width: 100%;">
                                 
@@ -45,7 +43,7 @@
                                 
                                 <div style="display: flex; align-items: center; gap: 5px;">
                                     <label for="qtd-<%= item.id %>" style="margin:0; font-size: 0.8em;">Qtd:</label>
-                                    <input type="number" id="qtd-<%= item.id %>" name="quantity" value="<%= item.quantity %>" step="any" style="width: 70px; padding: 5px; border: 1px solid #ccc; border-radius: 4px;" required>
+                                    <input type="number" id="qtd-<%= item.id %>" name="quantity" value="<%= item.quantity %>" min="0" step="any" style="width: 70px; padding: 5px; border: 1px solid #ccc; border-radius: 4px;" required>
                                 </div>
 
                                 <div style="display: flex; align-items: center; gap: 5px;">
@@ -97,7 +95,7 @@
                 </div>
                 <div class="form-group">
                     <label for="quantity">Quantidade:</label>
-                    <input type="number" id="quantity" name="quantity" step="any" placeholder="0.00" required>
+                    <input type="number" id="quantity" name="quantity" min="0" step="any" placeholder="0.00" required>
                 </div>
                 
                 <div class="form-group">
@@ -127,5 +125,4 @@
     </div>
 </div>
 
-<!-- Link para o script externo -->
 <script src="/js/estoque.js"></script>

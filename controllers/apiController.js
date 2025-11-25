@@ -3,9 +3,7 @@ const ingredientModel = require('../models/ingredientModel');
 
 const apiController = {
 
-    // --- RECEITAS ---
 
-    // GET /api/receitas
     async getAllRecipes(req, res) {
         try {
             const recipes = await recipeModel.findAll();
@@ -15,7 +13,6 @@ const apiController = {
         }
     },
 
-    // GET /api/receitas/:id
     async getRecipeById(req, res) {
         try {
             const { id } = req.params;
@@ -27,7 +24,6 @@ const apiController = {
 
             const ingredients = await recipeModel.findIngredientsByRecipeId(id);
             
-            // Combina os dados da receita com os ingredientes
             const fullRecipe = { ...recipe, ingredients };
 
             res.json({ success: true, data: fullRecipe });
@@ -36,7 +32,6 @@ const apiController = {
         }
     },
 
-    // POST /api/receitas
     async createRecipe(req, res) {
         try {
             const { title, description, instructions, userId } = req.body;
@@ -56,7 +51,6 @@ const apiController = {
         }
     },
 
-    // DELETE /api/receitas/:id
     async deleteRecipe(req, res) {
         try {
             const { id } = req.params;
@@ -73,9 +67,6 @@ const apiController = {
         }
     },
 
-    // --- INGREDIENTES ---
-
-    // GET /api/ingredientes
     async getAllIngredients(req, res) {
         try {
             const ingredients = await ingredientModel.findAll();
@@ -85,7 +76,6 @@ const apiController = {
         }
     },
 
-    // POST /api/ingredientes
     async createIngredient(req, res) {
         try {
             const { name, calories, proteins, carbs, fats } = req.body;

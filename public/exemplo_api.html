@@ -28,19 +28,19 @@
             listaDiv.innerHTML = '<p>Carregando...</p>';
 
             try {
-                // Faz a requisição para a SUA API
+                
                 const response = await fetch('/api/receitas');
                 const dados = await response.json();
 
                 if (dados.success) {
-                    listaDiv.innerHTML = ''; // Limpa o "Carregando..."
+                    listaDiv.innerHTML = '';
                     
                     if (dados.data.length === 0) {
                         listaDiv.innerHTML = '<p>Nenhuma receita encontrada.</p>';
                         return;
                     }
 
-                    // Cria um cartão para cada receita
+                    
                     dados.data.forEach(receita => {
                         const div = document.createElement('div');
                         div.className = 'card';

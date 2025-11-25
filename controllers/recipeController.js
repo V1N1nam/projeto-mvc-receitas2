@@ -1,11 +1,10 @@
 const recipeModel = require('../models/recipeModel');
 const ingredientModel = require('../models/ingredientModel');
 const pantryItemModel = require('../models/pantryItemModel');
-const fs = require('fs'); // Necessário para apagar a imagem antiga
+const fs = require('fs'); 
 
 const recipeController = {
 
-    // Lista todas as receitas
     async listAll(req, res) {
         try {
             const recipes = await recipeModel.findAll();
@@ -16,7 +15,6 @@ const recipeController = {
         }
     },
 
-    // Mostra o formulário de criação de receita
     async showCreateForm(req, res) {
         try {
             const ingredients = await ingredientModel.findAll();
@@ -41,7 +39,6 @@ const recipeController = {
         }
     },
 
-    // Processa a criação da receita
     async create(req, res) {
         try {
             const { title, description, instructions } = req.body;
@@ -75,9 +72,6 @@ const recipeController = {
         }
     },
 
-    // --- NOVAS FUNÇÕES PARA EDITAR RECEITAS ---
-
-    // 1. Mostrar formulário de edição
     async showEditForm(req, res) {
         try {
             const recipeId = req.params.id;
@@ -120,7 +114,6 @@ const recipeController = {
         }
     },
 
-    // 2. Processar a atualização
     async update(req, res) {
         try {
             const recipeId = req.params.id;
@@ -134,7 +127,6 @@ const recipeController = {
 
             let image_path = recipe.image_path;
             if (req.file) {
-                // Tenta apagar a imagem antiga se existir
                 if (image_path) {
                     try {
                         const oldPath = `public${image_path}`;
@@ -175,7 +167,6 @@ const recipeController = {
         }
     },
 
-    // 3. Remover receita
     async delete(req, res) {
         try {
             const recipeId = req.params.id;
@@ -211,9 +202,6 @@ const recipeController = {
         }
     },
 
-    // --- FIM EDIÇÃO/REMOÇÃO ---
-
-    // Detalhes da receita
     async getDetails(req, res) {
         try {
             const recipeId = req.params.id;

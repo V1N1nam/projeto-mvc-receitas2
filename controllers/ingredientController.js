@@ -2,7 +2,6 @@ const ingredientModel = require('../models/ingredientModel');
 
 const ingredientController = {
 
-    // Lista todos os ingredientes
     async listAll(req, res) {
         try {
             const ingredients = await ingredientModel.findAll();
@@ -13,12 +12,10 @@ const ingredientController = {
         }
     },
 
-    // Mostra o formulário de criação
     showCreateForm(req, res) {
         res.render('formularios_ingredientes', { title: 'Novo Ingrediente' });
     },
 
-    // Processa a criação
     async create(req, res) {
         try {
             const { name, calories, proteins, carbs, fats } = req.body;
@@ -31,9 +28,6 @@ const ingredientController = {
         }
     },
 
-    // --- NOVAS FUNÇÕES PARA EDITAR ---
-
-    // 1. Mostra o formulário preenchido para edição
     async showEditForm(req, res) {
         try {
             const { id } = req.params;
@@ -44,7 +38,6 @@ const ingredientController = {
                 return res.redirect('/ingredientes');
             }
 
-            // Renderiza a mesma view, mas agora passando o objeto 'ingredient'
             res.render('formularios_ingredientes', { 
                 title: 'Editar Ingrediente', 
                 ingredient: ingredient 
@@ -56,7 +49,6 @@ const ingredientController = {
         }
     },
 
-    // 2. Processa a atualização dos dados
     async update(req, res) {
         try {
             const { id } = req.params;
@@ -73,9 +65,6 @@ const ingredientController = {
         }
     },
 
-    // --- FIM DAS NOVAS FUNÇÕES ---
-
-    // Excluir Ingrediente
     async delete(req, res) {
         try {
             const { id } = req.params;

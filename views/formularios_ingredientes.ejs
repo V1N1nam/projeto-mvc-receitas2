@@ -10,21 +10,22 @@
         <input type="text" id="name" name="name" value="<%= typeof ingredient !== 'undefined' ? ingredient.name : '' %>" required>
     </div>
     <p>Informações nutricionais (por 100g ou unidade padrão):</p>
+    
     <div class="form-group">
         <label for="calories">Calorias (kcal):</label>
-        <input type="number" id="calories" name="calories" step="any" value="<%= typeof ingredient !== 'undefined' ? ingredient.calories : '' %>">
+        <input type="number" id="calories" name="calories" min="0" step="any" value="<%= typeof ingredient !== 'undefined' ? ingredient.calories : '' %>">
     </div>
     <div class="form-group">
         <label for="proteins">Proteínas (g):</label>
-        <input type="number" id="proteins" name="proteins" step="any" value="<%= typeof ingredient !== 'undefined' ? ingredient.proteins : '' %>">
+        <input type="number" id="proteins" name="proteins" min="0" step="any" value="<%= typeof ingredient !== 'undefined' ? ingredient.proteins : '' %>">
     </div>
     <div class="form-group">
         <label for="carbs">Carboidratos (g):</label>
-        <input type="number" id="carbs" name="carbs" step="any" value="<%= typeof ingredient !== 'undefined' ? ingredient.carbs : '' %>">
+        <input type="number" id="carbs" name="carbs" min="0" step="any" value="<%= typeof ingredient !== 'undefined' ? ingredient.carbs : '' %>">
     </div>
     <div class="form-group">
         <label for="fats">Gorduras (g):</label>
-        <input type="number" id="fats" name="fats" step="any" value="<%= typeof ingredient !== 'undefined' ? ingredient.fats : '' %>">
+        <input type="number" id="fats" name="fats" min="0" step="any" value="<%= typeof ingredient !== 'undefined' ? ingredient.fats : '' %>">
     </div>
     <button type="submit" class="btn btn-primary">
         <%= typeof ingredient !== 'undefined' ? 'Atualizar Ingrediente' : 'Salvar Ingrediente' %>

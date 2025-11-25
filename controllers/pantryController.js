@@ -3,7 +3,6 @@ const ingredientModel = require('../models/ingredientModel');
 
 const pantryController = {
 
-    // Mostra o estoque
     async showPantry(req, res) {
         try {
             const userId = req.session.userId;
@@ -23,7 +22,6 @@ const pantryController = {
         }
     },
 
-    // Adiciona item
     async addItem(req, res) {
         try {
             const userId = req.session.userId;
@@ -46,16 +44,14 @@ const pantryController = {
         }
     },
 
-    // --- ATUALIZADO: Atualizar Item Completo ---
     async updateItem(req, res) {
         try {
             const userId = req.session.userId;
             const { id } = req.params;
-            const { quantity, unit } = req.body; // Agora pega a unidade também
+            const { quantity, unit } = req.body;
 
             if (!userId) return res.status(403).send('Acesso negado.');
 
-            // Chama o método genérico 'update'
             await pantryItemModel.update(id, quantity, unit);
             
             req.flash('success', 'Item atualizado com sucesso!');
@@ -67,7 +63,6 @@ const pantryController = {
         }
     },
 
-    // Remove item
     async deleteItem(req, res) {
         try {
             const pantryItemId = req.params.id;
